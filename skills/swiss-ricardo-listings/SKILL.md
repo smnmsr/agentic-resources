@@ -24,7 +24,11 @@ Create persuasive, accurate, ready-to-paste Ricardo.ch titles and descriptions. 
 
 - Return a copy-ready **Titel** and **Beschreibung**. Keep title at or below 60 characters and description at or below 5000 characters, including spaces. Count before responding; keep labels and any auction settings outside the copy text.
 - Title should identify product type, brand and model, with condition or a useful included extra when space permits. Make it searchable and concise.
-- Description should cover the item and practical benefits, relevant specifications, confirmed usage and reason for sale, condition and flaws, precise delivery contents, compatibility or setup requirements, and delivery/pickup details where relevant. Include original price or warranty only when confirmed and useful.
+- Structure the description with these sections, omitting a section only when it has no useful confirmed content:
+  - **Einleitung:** Identify the item and why it is a good choice; include prior use and reason for sale when known.
+  - **Gerätebeschreibung:** Position the product appealingly; translate key specifications into practical benefits. Include important compatibility or setup requirements.
+  - **Zustand und Garantie:** State confirmed functionality and testing plainly; disclose wear and faults. Mention reset state if relevant and confirmed. Include warranty only when explicitly confirmed.
+  - **Lieferumfang:** Give exact contents and quantities; identify important missing accessories. Add delivery or pickup details when relevant.
 - Use short paragraphs and scannable bullets. Translate key specifications into practical benefits; include enough detail to reduce buyer research without turning description into a datasheet.
 - State condition plainly. Say `funktioniert einwandfrei` only when seller confirms; distinguish tested, untested, partially tested and intermittent faults. Describe cosmetic wear and known defects explicitly.
 - Never invent or imply condition, test results, accessories, reason for sale, compatibility, price, warranty, or other item-specific facts. Avoid unverifiable superlatives and universal suitability claims.
