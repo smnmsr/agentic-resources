@@ -1,0 +1,43 @@
+name: Model Pareto report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 5 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: model-pareto-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test
+        run: python -m unittest discover -s model-curator -p 'test_*.py'
+      - name: Generate report
+        env:
+          AA_API_KEY: ${{ secrets.AA_API_KEY }}
+        run: python model-curator/curate.py
+      - name: Open or update report PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/model-pareto-report
+          add-paths: model-curator/MODELS.md
+          commit-message: "Update model Pareto report"
+          title: "Update OpenCode model Pareto report"
+          body: |
+            Latest AA Intelligence Index and task costs intersected with the OpenCode Go and paid catalogs.
+
+            Review `model-curator/MODELS.md` for both frontiers, coverage and special pricing.
+            This does not change any model selections or local configuration.
