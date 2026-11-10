@@ -83,6 +83,9 @@ class CurateTests(unittest.TestCase):
         self.assertIn("## Go frontier", report)
         self.assertIn("## Paid frontier", report)
         self.assertIn("Artificial Analysis", report)
+        self.assertIn("Index v5.0", report)
+        self.assertIn("Index v5.1", curate.render(5.1, [aa()], {"Go": [model()]}, "2026-11-10"))
+        self.assertNotIn("All comparable configurations", report)
         self.assertEqual(report, curate.render(5, [aa()], {"Go": [model()], "Paid": [model()]}, "2026-11-10"))
 
 

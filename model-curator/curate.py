@@ -185,50 +185,51 @@ def table(entries):
 
 def render(version, aa_models, catalogs, date):
     scored = sum(usable_number(measures(m)[0]) for m in aa_models)
-    lines = ["# OpenCode model Pareto frontiers", "", f"Fetched {date}; AA Intelligence Index version {version:g} "
-             "(API reports major.minor, not patch).", "",
-             f"AA catalog: {len(aa_models)} configurations, {scored} with a current score.", "",
-             "## How to read this", "",
-             "Higher intelligence and lower AA cost per task are better. A frontier entry is not "
-             "strictly dominated on both axes. Equal points are retained; effort variants are separate points.",
-             "", "Both tables use **AA cost per Intelligence Index task**, not token prices, "
-             "OpenCode charges, or measured Go allowance consumption. Go is the Go-available subset, "
-             "not an allowance-adjusted frontier. AA costs are a proxy; discounts, caching and routing "
-             "can make actual OpenCode costs differ. Cost is per benchmark task, not per successful task.",
-             "", "Matching preserves versions and dates; no fuzzy or cross-version score substitution. "
-             "Named/default AA configurations remain named/default; explicit effort settings must be "
-             "supported by the catalog. Availability does not imply privacy-policy approval.", ""]
+    version_label = str(version) if "." in str(version) else f"{version}.0"
+    lines = ["# OpenCode model frontiers", "",
+             f"**AA Intelligence Index v{version_label} · {date} · {scored} scored configurations**", "",
+             "Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.",
+             "AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage. "
+             "API version excludes patch numbers. [Methodology](README.md).", ""]
+    all_offers = {}
     for channel, catalog in catalogs.items():
         entries, missing, offers = intersect(catalog, aa_models)
         front = frontier(entries)
         lines += [f"## {channel} frontier", "",
-                  f"{len(catalog)} catalog endpoints; {len(set(e['id'] for e in entries))} matched paid-price "
-                  f"endpoints; {len(entries)} comparable configurations; {len(front)} frontier points.", ""]
-        lines += table(front) + ["", "<details>", "<summary>All comparable configurations</summary>", ""]
-        lines += table(sorted(entries, key=lambda e: (e['id'], e['cost']))) + ["", "</details>", ""]
-        lines += [f"### {channel}: free endpoints and special pricing (separate)", "",
-                  "These do not change the AA cost axis. Free endpoints are excluded from the frontier. "
-                  "Discounted paid models remain eligible using AA reference costs. OpenCode rates below "
-                  "are input/output dollars per million tokens, for context only.", ""]
+                  f"**{len(set(e['id'] for e in entries))}/{len(catalog)} endpoints matched · "
+                  f"{len(entries)} configurations · {len(front)} frontier points**", ""]
+        lines += table(front) + [""]
+        if missing:
+            reasons = {}
+            for _, reason in missing:
+                category = ("unsupported effort" if "effort" in reason else
+                            "missing score/cost" if "AA score" in reason else "unmatched identity/pricing")
+                reasons[category] = reasons.get(category, 0) + 1
+            lines += ["Not ranked: " + "; ".join(f"{count} {reason}" for reason, count in sorted(reasons.items())) + ".", ""]
         for offer in offers:
-            lines += [f"- `{offer['id']}`: catalog rates ${offer['input']:g}/${offer['output']:g}."
-                      + (" Free endpoint; regular price not supplied by this catalog entry." if offer['free'] else "")]
-            if offer['factor'] != 1:
-                lines += [f"  - Post-promotion rates inferred from the date-only multiplier: "
-                          f"${offer['input'] * offer['factor']:g}/${offer['output'] * offer['factor']:g}."]
-            if offer['counterpart']:
-                lines += [f"  - Nonfree counterpart in this catalog: {offer['counterpart']}."]
-            if offer['rules']:
-                lines += [f"  - Published pricing rules: `{json.dumps(offer['rules'], sort_keys=True)}`"]
-        if not offers:
-            lines += ["None reported by the catalog."]
-        lines += ["", "<details>", "<summary>Unmatched or insufficient data</summary>", ""]
-        lines += [f"- `{cell(mid)}`: {cell(reason)}" for mid, reason in missing] or ["None."]
-        lines += ["", "</details>", ""]
-    lines += ["## Sources", "", "Scores and benchmark task costs: [Artificial Analysis](https://artificialanalysis.ai/) "
-              f"([free API]({AA_URL})).", ""]
-    lines += [f"- OpenCode {channel}: {url}" for channel, url in CATALOG_URLS.items()]
-    lines += ["", "No model selections or local configuration are changed by this report."]
+            key = (offer['id'], offer['input'], offer['output'], json.dumps(offer['rules'], sort_keys=True))
+            if key not in all_offers:
+                all_offers[key] = (offer, [])
+            all_offers[key][1].append(channel)
+    lines += ["## Special pricing", "", "OpenCode input/output $ per million tokens; does not alter AA $/task.", "",
+              "| Model | Available on | Catalog rates | Regular rates / condition |", "|---|---|---:|---|"]
+    free_counts = {}
+    for offer, channels in all_offers.values():
+        if offer['free']:
+            for channel in channels:
+                free_counts[channel] = free_counts.get(channel, 0) + 1
+            continue
+        condition = "Conditional pricing; see catalog"
+        if offer['factor'] != 1:
+            starts = offer['rules'][0]['when']['date']['gte']
+            condition = (f"${offer['input'] * offer['factor']:g}/${offer['output'] * offer['factor']:g} "
+                         f"from {starts}")
+        elif offer['rules']:
+            condition = "; ".join(f"×{r.get('factor', '?')} under catalog conditions" for r in offer['rules'])
+        lines += [f"| `{offer['id']}` | {', '.join(channels)} | ${offer['input']:g}/${offer['output']:g} | {condition} |"]
+    lines += ["", "Free endpoints excluded: " + (", ".join(f"{count} {channel}" for channel, count in free_counts.items()) or "none") + ".", "",
+              "Sources: [Artificial Analysis](https://artificialanalysis.ai/) · "
+              f"[Go catalog]({CATALOG_URLS['Go']}) · [Paid catalog]({CATALOG_URLS['Paid']})."]
     return "\n".join(lines) + "\n"
 
 

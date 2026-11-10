@@ -18,6 +18,7 @@ python -m unittest discover -s model-curator -p 'test_*.py'
 Set repository Actions secret `AA_API_KEY`. After merging the workflow into the
 default branch, run **Model Pareto report** manually in Actions; it also runs
 Mondays at 05:30 UTC. The workflow opens/updates one PR containing `MODELS.md`.
+An unchanged report creates no PR; the run summary always shows the report and outcome.
 GitHub must allow Actions to create pull requests. Fetch failures fail the job
 without replacing the report with stale or partial data.
 
@@ -27,10 +28,10 @@ version. The API version is major.minor; patch changes are not represented.
 
 Matching removes punctuation, not version/date suffixes. Model names, canonical
 IDs and exact AA slugs provide identity matches. Explicit AA effort levels must
-appear in the OpenCode capabilities. Unmatched endpoints are listed rather than
+appear in the OpenCode capabilities. Unmatched endpoints are counted rather than
 fuzzy-matched. The first version deliberately prioritizes precision over coverage.
 
-Free endpoints appear separately, never as zero-cost frontier points. Nonzero
+Free endpoints are counted separately, never used as zero-cost frontier points. Nonzero
 discounted endpoints still use AA reference task cost on the main frontier;
 OpenCode pricing rules are shown separately. `cost.multipliers` can expose regular
 post-promotion prices (e.g. a date-only rule) or peak/context pricing. The script

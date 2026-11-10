@@ -30,6 +30,7 @@ jobs:
           AA_API_KEY: ${{ secrets.AA_API_KEY }}
         run: python model-curator/curate.py
       - name: Open or update report PR
+        id: report-pr
         uses: peter-evans/create-pull-request@v8
         with:
           branch: automation/model-pareto-report
@@ -41,3 +42,13 @@ jobs:
 
             Review `model-curator/MODELS.md` for both frontiers, coverage and special pricing.
             This does not change any model selections or local configuration.
+      - name: Run summary
+        env:
+          PR_URL: ${{ steps.report-pr.outputs.pull-request-url }}
+        run: |
+          if [ -n "$PR_URL" ]; then
+            echo "Report PR: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No report changes; no PR needed." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          cat model-curator/MODELS.md >> "$GITHUB_STEP_SUMMARY"
