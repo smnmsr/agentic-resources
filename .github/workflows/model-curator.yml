@@ -28,6 +28,7 @@ jobs:
       - name: Generate report
         env:
           AA_API_KEY: ${{ secrets.AA_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         run: python model-curator/curate.py
       - name: Open or update report PR
         id: report-pr
@@ -37,13 +38,16 @@ jobs:
           add-paths: |
             model-curator/MODELS.md
             model-curator/plots/*.svg
+            opencode-config/models.json
           commit-message: "Update model Pareto report"
           title: "Update OpenCode model Pareto report"
           body: |
             Latest AA Intelligence Index and task costs intersected with the OpenCode Go and paid catalogs.
 
             Review `model-curator/MODELS.md` for both frontiers, coverage and special pricing.
-            This does not change any model selections or local configuration.
+            Also updates the model config fragment: only frontier models stay enabled,
+            with aliases for curated picks. After merge, the config workflow publishes
+            the merged config for machines enrolled in hourly sync.
       - name: Run summary
         env:
           PR_URL: ${{ steps.report-pr.outputs.pull-request-url }}

@@ -16,6 +16,7 @@ CATALOG_URLS = {
     "Paid": "https://opencode.ai/inference/v1/models",
 }
 HERE = Path(__file__).resolve().parent
+CLIENT_CATALOG_URL = "https://models.dev/api.json"
 SELECTION = {
     "Go": [("Small", 25), ("Medium", 40), ("Strong", None)],
     "Paid": [("Small", 25), ("Medium", 40), ("Strong", 55), ("Flagship", None)],
@@ -23,18 +24,27 @@ SELECTION = {
 MIN_SCORE_GAP = 3  # Editorial spacing, not a claim about benchmark uncertainty.
 
 
-def fetch(url, key=None):
-    headers = {"User-Agent": "agentic-resources-model-curator/1.0"}
-    if key:
-        headers["x-api-key"] = key
-    with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=60) as response:
+def fetch(url, headers=None):
+    request_headers = {"User-Agent": "agentic-resources-model-curator/1.0", **(headers or {})}
+    with urllib.request.urlopen(urllib.request.Request(url, headers=request_headers), timeout=60) as response:
         return json.load(response)
+
+
+def fetch_catalogs(key):
+    """Models the OpenCode workspace behind `key` can call (public lists include disabled ones)."""
+    catalogs = {}
+    for channel, url in CATALOG_URLS.items():
+        catalog = fetch(url, {"Authorization": f"Bearer {key}"})["data"]
+        if not catalog:
+            raise ValueError(f"Empty {channel} catalog")
+        catalogs[channel] = catalog
+    return catalogs
 
 
 def fetch_aa(key):
     models, version, page = [], None, 1
     while True:
-        data = fetch(f"{AA_URL}?page={page}", key)
+        data = fetch(f"{AA_URL}?page={page}", {"x-api-key": key})
         current = data["intelligence_index_version"]
         if version is not None and current != version:
             raise ValueError("AA index version changed during pagination; retry the run")
@@ -240,6 +250,63 @@ def selection_table(front, channel):
     return lines
 
 
+def alias_settings(point):
+    """V2 native effort settings, matching core/src/variant.ts (v2.2.7).
+
+    Fail closed for new model families rather than publish an alias at the
+    wrong effort. Aliases deliberately have no selectable reasoning variants.
+    """
+    effort = point["effort"]
+    if effort is None:
+        return {}
+    if effort not in {"none", "minimal", "low", "medium", "high", "xhigh", "max"}:
+        raise ValueError(f"Unreviewed alias effort: {effort}")
+    if point["id"].startswith("claude-"):
+        if effort == "none":
+            return {"thinking": {"type": "disabled"}}
+        return {"effort": effort, "thinking": {"type": "adaptive", "display": "summarized"}}
+    if point["id"].startswith("gpt-"):
+        return {"reasoningEffort": effort}
+    if point["id"].startswith("gemini-"):
+        if effort == "none":
+            return {"thinkingConfig": {"includeThoughts": False, "thinkingBudget": 0}}
+        return {"thinkingConfig": {"includeThoughts": True, "thinkingLevel": effort}}
+    raise ValueError(f"Unreviewed alias effort mapping: {point['id']} ({effort})")
+
+
+def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=None):
+    providers = {}
+    for channel, catalog in catalogs.items():
+        if not public_catalogs[channel]:
+            raise ValueError(f"Empty {channel} public catalog")
+        approved, _ = filter_privacy(catalog, channel, policy)
+        front = frontier(intersect(approved, aa_models)[0])
+        if not front:
+            raise ValueError(f"No {channel} frontier; refusing to disable every model")
+        enabled = {point["id"] for point in front}
+        known = {m["id"] for m in public_catalogs[channel] + catalog}
+        provider_id = "opencode-go" if channel == "Go" else "opencode"
+        if client_catalog is not None:
+            client_models = client_catalog[provider_id]["models"]
+            if not client_models:
+                raise ValueError(f"Empty {provider_id} client inventory")
+            known.update(client_models)
+        models = {mid: {"disabled": mid not in enabled} for mid in sorted(known)}
+        for tier, point in shortlist(front, channel):
+            alias = f"curated-{tier.lower()}"
+            if alias in known:
+                raise ValueError(f"Alias collides with catalog model: {alias}")
+            models[alias] = {
+                "modelID": point["id"], "name": f"{tier} — {point['aa_name']}",
+                "disabled": False, "settings": alias_settings(point),
+            }
+            if point["effort"] is not None:
+                models[alias]["capabilities"] = {"reasoning": {"supported": point["effort"] != "none"}}
+        providers[provider_id] = {"models": dict(sorted(models.items()))}
+    # No implicit default choice: defaults can be added here once explicitly chosen.
+    return {"providers": providers}
+
+
 def table(entries):
     lines = ["| # | OpenCode model | AA configuration | Score | AA $/task |",
              "|---:|---|---|---:|---:|"]
@@ -413,7 +480,8 @@ def render(version, aa_models, catalogs, date, policy=None):
         lines += [f"| `{offer['id']}` | {', '.join(channels)} | ${offer['input']:g}/${offer['output']:g} | {condition} |"]
     lines += ["", "Free endpoints excluded: " + (", ".join(f"{count} {channel}" for channel, count in free_counts.items()) or "none") + ".", "",
               "Sources: [Artificial Analysis](https://artificialanalysis.ai/) · "
-              f"[Go catalog]({CATALOG_URLS['Go']}) · [Paid catalog]({CATALOG_URLS['Paid']})."]
+              f"[Go catalog]({CATALOG_URLS['Go']}) · [Paid catalog]({CATALOG_URLS['Paid']}), "
+              "authenticated: workspace-enabled models only."]
     return "\n".join(lines) + "\n"
 
 
@@ -438,21 +506,23 @@ def write_plots(aa_models, catalogs, policy, plot_dir):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=HERE / "MODELS.md")
+    parser.add_argument("--models-output", type=Path,
+                        default=HERE.parent / "opencode-config" / "models.json")
     args = parser.parse_args()
     key = os.environ.get("AA_API_KEY")
-    if not key:
-        parser.error("AA_API_KEY is required")
+    opencode_key = os.environ.get("OPENCODE_API_KEY")
+    if not key or not opencode_key:
+        parser.error("AA_API_KEY and OPENCODE_API_KEY are required")
     version, models = fetch_aa(key)
-    catalogs = {}
-    for channel, url in CATALOG_URLS.items():
-        catalog = fetch(url)["data"]
-        if not catalog:
-            raise ValueError(f"Empty {channel} catalog")
-        catalogs[channel] = catalog
+    catalogs = fetch_catalogs(opencode_key)
+    public_catalogs = {channel: fetch(url)["data"] for channel, url in CATALOG_URLS.items()}
     policy = json.loads((HERE / "privacy.json").read_text())
+    config = model_config(models, catalogs, public_catalogs, policy, fetch(CLIENT_CATALOG_URL))
     report = render(version, models, catalogs, datetime.datetime.now(datetime.timezone.utc).date().isoformat(), policy)
     args.output.write_text(report)
     write_plots(models, catalogs, policy, args.output.parent / "plots")
+    args.models_output.parent.mkdir(parents=True, exist_ok=True)
+    args.models_output.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n")
     print(f"Wrote {args.output}")
 
 

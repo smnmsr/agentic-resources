@@ -17,6 +17,30 @@ def model(mid="example-2", **kwargs):
 
 
 class CurateTests(unittest.TestCase):
+    def test_model_config_disables_nonfrontier_and_preserves_alias_effort(self):
+        catalog = [model("gpt-example"), model("unmatched")]
+        catalogs = {"Go": catalog, "Paid": catalog}
+        public = {"Go": catalog + [model("public-only")], "Paid": catalog}
+        policy = {"allowed": {channel: ["gpt-example", "unmatched"] for channel in catalogs}}
+        client = {p: {"models": {"client-only": {}}} for p in ("opencode", "opencode-go")}
+        config = curate.model_config([aa("GPT Example (High)", "gpt-example-high")], catalogs, public, policy, client)
+        models = config["providers"]["opencode-go"]["models"]
+        self.assertFalse(models["gpt-example"]["disabled"])
+        self.assertTrue(models["public-only"]["disabled"])
+        self.assertTrue(models["unmatched"]["disabled"])
+        self.assertTrue(models["client-only"]["disabled"])
+        self.assertEqual(models["curated-strong"]["modelID"], "gpt-example")
+        self.assertEqual(models["curated-strong"]["settings"], {"reasoningEffort": "high"})
+        self.assertNotIn("model", config)
+
+    def test_alias_settings_and_empty_frontier_fail_closed(self):
+        for mid, key in (("claude-haiku-5-5", "effort"), ("gemini-4-argon", "thinkingConfig")):
+            self.assertIn(key, curate.alias_settings({"id": mid, "effort": "high"}))
+        with self.assertRaises(ValueError):
+            curate.alias_settings({"id": "unknown", "effort": "high"})
+        with self.assertRaises(ValueError):
+            curate.model_config([], {"Go": []}, {"Go": []}, {"allowed": {"Go": []}})
+
     def points(self, values):
         return [{"id": str(i), "slug": str(i), "aa_name": f"Model {i}", "cost": cost, "score": score}
                 for i, (cost, score) in enumerate(values)]
@@ -141,6 +165,19 @@ class CurateTests(unittest.TestCase):
         ]
         with self.assertRaises(ValueError):
             curate.fetch_aa("unused")
+
+    @patch("curate.fetch")
+    def test_catalogs_use_workspace_key(self, fetch):
+        fetch.side_effect = [{"data": [model()]}, {"data": [model("example-3")]}]
+        self.assertEqual(set(curate.fetch_catalogs("oc_test")), {"Go", "Paid"})
+        for call in fetch.call_args_list:
+            self.assertEqual(call.args[1], {"Authorization": "Bearer oc_test"})
+
+    @patch("curate.fetch")
+    def test_empty_catalog_fails(self, fetch):
+        fetch.return_value = {"data": []}
+        with self.assertRaises(ValueError):
+            curate.fetch_catalogs("oc_test")
 
     def test_report(self):
         report = curate.render(5, [aa()], {"Go": [model()], "Paid": [model()]}, "2026-11-10")

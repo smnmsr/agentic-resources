@@ -10,8 +10,12 @@ verified US/EU hosting. AA task costs are a comparison proxy, not actual Go usag
 In GitHub, open **Actions → Model Pareto report → Run workflow**.
 It also runs every Monday at 05:30 UTC.
 
-Requires the repository secret `AA_API_KEY`. Changed reports open a PR;
-unchanged reports create none. Results are also shown in the run summary.
+Requires the repository secrets `AA_API_KEY` and `OPENCODE_API_KEY` (a read-only
+OpenCode key; only models its workspace can call are compared). Changed reports
+open a PR; unchanged reports create none. Results are also shown in the run summary.
+
+The same PR updates the [model config fragment](../opencode-config/README.md).
+After merge, a separate workflow publishes the merged config for enrolled machines.
 
 ## Selection
 
