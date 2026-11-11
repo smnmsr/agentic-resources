@@ -17,6 +17,47 @@ def model(mid="example-2", **kwargs):
 
 
 class CurateTests(unittest.TestCase):
+    def points(self, values):
+        return [{"id": str(i), "slug": str(i), "aa_name": f"Model {i}", "cost": cost, "score": score}
+                for i, (cost, score) in enumerate(values)]
+
+    def test_hull_removes_unsupported_and_collinear_points(self):
+        points = self.points([(1, 10), (2, 11), (4, 20), (8, 25), (16, 30)])
+        self.assertEqual([p["score"] for p in curate.upper_hull(points)], [10, 30])
+        self.assertEqual(curate.upper_hull(points[::-1]), curate.upper_hull(points))
+
+    def test_hull_ties_and_empty(self):
+        self.assertEqual(curate.upper_hull([]), [])
+        points = self.points([(1, 10), (1, 10), (2, 20)])
+        self.assertEqual(len(curate.upper_hull(points)), 2)
+
+    def test_knee_per_band_and_endpoint_fallback(self):
+        points = self.points([(1, 10), (2, 24), (4, 35), (8, 43), (16, 48), (32, 51)])
+        picks = curate.shortlist(points, "Go")
+        self.assertEqual([(tier, p["score"]) for tier, p in picks],
+                         [("Small", 24), ("Medium", 35), ("Strong", 48)])
+        self.assertEqual(curate.shortlist(points[:1], "Paid"), [("Small", points[0])])
+        self.assertEqual(curate.shortlist([], "Go"), [])
+
+    def test_near_equivalent_candidates_across_band_boundary(self):
+        points = self.points([(1, 24), (2, 26), (8, 31), (32, 35)])
+        picks = curate.shortlist(points, "Go")
+        self.assertEqual([p["score"] for _, p in picks], [24, 31])
+        self.assertLessEqual(len(picks), 3)
+
+    def test_current_paid_examples(self):
+        points = self.points([(0.0051, 9.7), (0.0422, 18.5), (0.0438, 18.6),
+                              (0.0729, 21.4), (0.0918, 24.6), (0.152, 27.9),
+                              (0.1586, 29.9), (0.1615, 34.8), (0.3594, 46.3),
+                              (0.591, 50.3), (0.764, 52.5), (1.2721, 54.6),
+                              (3.2386, 54.8), (3.6589, 55.3), (3.8026, 56.4),
+                              (6.0472, 57.4), (9.0784, 61.8), (14.8286, 62.2), (26.5386, 64.6)])
+        picks = curate.shortlist(points, "Paid")
+        self.assertIn(points[7], [p for _, p in picks])
+        self.assertNotIn(points[12], [p for _, p in picks])
+        self.assertEqual(len(picks), 4)
+        self.assertIn("| Medium | 8 |", "\n".join(curate.selection_table(points, "Paid")))
+
     def test_privacy_unknown_and_contributor_excluded(self):
         policy = {"allowed": {"Go": ["example-2"]}}
         allowed, excluded = curate.filter_privacy(
@@ -105,6 +146,8 @@ class CurateTests(unittest.TestCase):
         report = curate.render(5, [aa()], {"Go": [model()], "Paid": [model()]}, "2026-11-10")
         self.assertIn("## Go frontier", report)
         self.assertIn("## Paid frontier", report)
+        self.assertIn("### Curated picks", report)
+        self.assertIn("| Strong | 1 | Example 2 (High) |", report)
         self.assertIn("Artificial Analysis", report)
         self.assertIn("Index v5.0", report)
         self.assertIn("Index v5.1", curate.render(5.1, [aa()], {"Go": [model()]}, "2026-11-10"))

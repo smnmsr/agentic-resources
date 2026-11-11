@@ -16,6 +16,11 @@ CATALOG_URLS = {
     "Paid": "https://opencode.ai/inference/v1/models",
 }
 HERE = Path(__file__).resolve().parent
+SELECTION = {
+    "Go": [("Small", 25), ("Medium", 40), ("Strong", None)],
+    "Paid": [("Small", 25), ("Medium", 40), ("Strong", 55), ("Flagship", None)],
+}
+MIN_SCORE_GAP = 3  # Editorial spacing, not a claim about benchmark uncertainty.
 
 
 def fetch(url, key=None):
@@ -174,6 +179,67 @@ def cell(value):
     return str(value).replace("|", "\\|").replace("\n", " ")
 
 
+def gain_per_doubling(a, b):
+    return (b["score"] - a["score"]) / math.log2(b["cost"] / a["cost"])
+
+
+def upper_hull(entries):
+    """Supported choices for score - lambda * log2(cost), lambda >= 0."""
+    hull = []
+    for point in frontier(entries):
+        if hull and point["cost"] == hull[-1]["cost"]:
+            continue  # Identical score/cost: retain the deterministic first alias.
+        while len(hull) >= 2 and gain_per_doubling(hull[-2], hull[-1]) <= gain_per_doubling(hull[-1], point):
+            hull.pop()
+        hull.append(point)
+    return hull
+
+
+def shortlist(entries, channel, bands=None, min_score_gap=MIN_SCORE_GAP):
+    """One strongest slope-drop corner per band; cheaper near-ties survive."""
+    bands = SELECTION[channel] if bands is None else bands
+    candidates = []
+    lower = -math.inf
+    front = frontier(entries)
+    for _, upper in bands:
+        upper = math.inf if upper is None else upper
+        hull = upper_hull([p for p in front if lower <= p["score"] < upper])
+        for i, point in enumerate(hull):
+            # Endpoints have no knee; use strongest endpoint only as fallback.
+            knee = (gain_per_doubling(hull[i - 1], point) - gain_per_doubling(point, hull[i + 1])
+                    if 0 < i < len(hull) - 1 else 0)
+            candidates.append((point, knee))
+        lower = upper
+    # Apply tolerance globally, not just within bands; avoid chaining small
+    # improvements by comparing to the last retained (cheaper) candidate.
+    distinct = []
+    for candidate in candidates:
+        if not distinct or candidate[0]["score"] - distinct[-1][0]["score"] >= min_score_gap:
+            distinct.append(candidate)
+    selected = []
+    lower = -math.inf
+    for label, upper in bands:
+        upper = math.inf if upper is None else upper
+        eligible = [(p, k) for p, k in distinct if lower <= p["score"] < upper]
+        if eligible:
+            point, knee = max(eligible, key=lambda item: (item[1], item[0]["score"], -item[0]["cost"]))
+            selected.append((label, point))
+        lower = upper
+    return selected
+
+
+def selection_table(front, channel):
+    picks = shortlist(front, channel)
+    if not picks:
+        return ["No curated candidates."]
+    lines = ["| Tier | Plot # | AA configuration | Score | AA $/task |",
+             "|---|---:|---|---:|---:|"]
+    for label, point in picks:
+        lines.append(f"| {label} | {front.index(point) + 1} | {cell(point['aa_name'])} | "
+                     f"{point['score']:g} | {point['cost']:.4f} |")
+    return lines
+
+
 def table(entries):
     lines = ["| # | OpenCode model | AA configuration | Score | AA $/task |",
              "|---:|---|---|---:|---:|"]
@@ -300,6 +366,16 @@ def render(version, aa_models, catalogs, date, policy=None):
                   f"{len(entries)} configurations · {len(front)} frontier points**", ""]
         plot_file = "go.svg" if channel == "Go" else "paid.svg"
         lines += [f"![{channel} Pareto plot](plots/{plot_file})", ""]
+        bands = SELECTION[channel]
+        bounds = ", ".join(f"{label} <{upper:g}" if upper is not None else f"{label} ≥{bands[-2][1]:g}"
+                           for label, upper in bands)
+        lines += ["### Curated picks", "",
+                  f"Score bands: {bounds} (lower bounds inclusive). "
+                  f"Log-cost upper hull within each band; largest slope drop per band. "
+                  f"Candidates less than {MIN_SCORE_GAP:g} score points apart keep the cheaper one. "
+                  "Empty bands are omitted; endpoint fallback uses the highest score. "
+                  "These are selection heuristics, not measured score uncertainty.", ""]
+        lines += selection_table(front, channel) + ["", "### Full frontier", ""]
         lines += table(front) + [""]
         if missing:
             reasons = {}
