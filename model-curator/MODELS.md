@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-10 · 118 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-11 · 119 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage. API version excludes patch numbers. [Methodology](README.md).
@@ -28,7 +28,7 @@ Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 
 ## Paid frontier
 
-**25/84 endpoints matched · 62 configurations · 19 frontier points**
+**26/85 endpoints matched · 65 configurations · 19 frontier points**
 
 | OpenCode model | AA configuration | Score | AA $/task |
 |---|---|---:|---:|
@@ -52,13 +52,13 @@ Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 | `claude-fable-5-2` | [Claude Fable 5.2 (Xhigh, Default Fallback)](https://artificialanalysis.ai/models/claude-fable-5-2-xhigh) | 62.2 | 14.8286 |
 | `claude-fable-5-2` | [Claude Fable 5.2 (Max, Default Fallback)](https://artificialanalysis.ai/models/claude-fable-5-2) | 64.6 | 26.5386 |
 
-Not ranked: 38 missing score/cost; 8 unmatched identity/pricing; 1 unsupported effort.
+Not ranked: 37 missing score/cost; 8 unmatched identity/pricing; 1 unsupported effort.
 
 ## Privacy filter
 
 No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
 - Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`.
-- Paid: `big-pickle`, `flint-40b-free`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`.
+- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`.
 Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
 
 ## Special pricing
