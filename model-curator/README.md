@@ -40,10 +40,18 @@ the original rule. It does not invent regular prices for free endpoints, reverse
 engineer arbitrary conditions, or reprice AA tasks. Go allowances are not supplied
 by these model catalogs and are not estimated here.
 
+Before matching, `privacy.json` filters endpoints to a reviewed allowlist: no
+training on request data and US/EU hosting. The catalogs do not expose these
+fields. Sources and review date are recorded in the policy; new/unknown IDs are
+excluded pending review. Channel-specific rules matter: Go Contributor endpoints
+train on prompts; Go DeepSeek requires Global routing, unlike paid Console's
+US/EU baseline. LongCat 2.5 is hosted in China; LongCat 2.0 hosting is unverified.
+Thirty-day retention alone is not a training exclusion. This is a reviewed
+documentation baseline, not live verification of the provider's routing.
+
 The Go frontier is a **Go-available cost/capability comparison**, not a measured
 allowance frontier. AA costs use AA's pricing/cache assumptions, not necessarily
-your actual bill. Privacy/region approval and task-specific suitability remain
-separate decisions. Availability is not a policy endorsement.
+your actual bill. Task-specific suitability remains a separate decision.
 
 Data attribution: [Artificial Analysis](https://artificialanalysis.ai/).
 Use is subject to their API terms; this project publishes a derived comparison,

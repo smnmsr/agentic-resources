@@ -17,6 +17,29 @@ def model(mid="example-2", **kwargs):
 
 
 class CurateTests(unittest.TestCase):
+    def test_privacy_unknown_and_contributor_excluded(self):
+        policy = {"allowed": {"Go": ["example-2"]}}
+        allowed, excluded = curate.filter_privacy(
+            [model(), model("example-2-contributor"), model("new-model")], "Go", policy)
+        self.assertEqual([m["id"] for m in allowed], ["example-2"])
+        self.assertEqual(excluded, ["example-2-contributor", "new-model"])
+
+    def test_actual_policy_channel_specific(self):
+        import json
+        policy = json.loads((curate.HERE / "privacy.json").read_text())
+        self.assertFalse(curate.filter_privacy([model("deepseek-v4-pro")], "Go", policy)[0])
+        self.assertTrue(curate.filter_privacy([model("deepseek-v4-pro")], "Paid", policy)[0])
+        for channel in ("Go", "Paid"):
+            self.assertFalse(curate.filter_privacy([model("longcat-2.5-free")], channel, policy)[0])
+            self.assertFalse(curate.filter_privacy([model("iceman-contributor-free")], channel, policy)[0])
+
+    def test_privacy_before_frontier_and_offers(self):
+        policy = {"allowed": {"Go": []}, "verified_on": "2026-11-10", "sources": {}}
+        report = curate.render(5, [aa()], {"Go": [model()]}, "2026-11-10", policy)
+        self.assertIn("0 frontier points", report)
+        self.assertNotIn("https://artificialanalysis.ai/models/example-2-high", report)
+        self.assertIn("## Privacy filter", report)
+
     def test_frontier_and_ties(self):
         points = [{"id": str(i), "slug": str(i), "cost": cost, "score": score}
                   for i, (cost, score) in enumerate([(1, 10), (2, 9), (2, 20), (1, 10), (3, 20)])]

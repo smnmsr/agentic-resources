@@ -7,7 +7,7 @@ AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage
 
 ## Go frontier
 
-**15/30 endpoints matched · 26 configurations · 12 frontier points**
+**14/30 endpoints matched · 25 configurations · 12 frontier points**
 
 | OpenCode model | AA configuration | Score | AA $/task |
 |---|---|---:|---:|
@@ -24,7 +24,7 @@ AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage
 | `kimi-k3.1-pro` | [Kimi K3.1 Pro](https://artificialanalysis.ai/models/kimi-k3-1-pro) | 46.5 | 3.6812 |
 | `gemini-4-argon` | [Gemini 4 Argon (High)](https://artificialanalysis.ai/models/gemini-4-argon) | 50.4 | 9.9466 |
 
-Not ranked: 7 missing score/cost; 3 unmatched identity/pricing; 2 unsupported effort.
+Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported effort.
 
 ## Paid frontier
 
@@ -54,19 +54,24 @@ Not ranked: 7 missing score/cost; 3 unmatched identity/pricing; 2 unsupported ef
 
 Not ranked: 38 missing score/cost; 8 unmatched identity/pricing; 1 unsupported effort.
 
+## Privacy filter
+
+No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
+- Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`.
+- Paid: `big-pickle`, `flint-40b-free`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`.
+Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
+
 ## Special pricing
 
 OpenCode input/output $ per million tokens; does not alter AA $/task.
 
 | Model | Available on | Catalog rates | Regular rates / condition |
 |---|---|---:|---|
-| `deepseek-v4-pro` | Go | $0.66/$1.98 | ×2 under catalog conditions |
-| `deepseek-v4.1-flash` | Go | $0.15/$0.6 | ×2 under catalog conditions |
 | `gemini-4-argon` | Go, Paid | $2/$10 | $4/$20 from 2026-12-01 |
 | `gemini-3.6-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 | `gemini-3.7-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 | `gemini-3.8-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 
-Free endpoints excluded: 3 Go, 12 Paid.
+Free endpoints excluded: 1 Go, 4 Paid.
 
 Sources: [Artificial Analysis](https://artificialanalysis.ai/) · [Go catalog](https://opencode.ai/inference/go/v1/models) · [Paid catalog](https://opencode.ai/inference/v1/models).

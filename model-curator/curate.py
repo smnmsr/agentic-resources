@@ -183,7 +183,13 @@ def table(entries):
     return lines if entries else ["No comparable models found."]
 
 
-def render(version, aa_models, catalogs, date):
+def filter_privacy(catalog, channel, policy):
+    approved = set(policy["allowed"][channel])
+    return ([m for m in catalog if m["id"] in approved],
+            [m["id"] for m in catalog if m["id"] not in approved])
+
+
+def render(version, aa_models, catalogs, date, policy=None):
     scored = sum(usable_number(measures(m)[0]) for m in aa_models)
     version_label = str(version) if "." in str(version) else f"{version}.0"
     lines = ["# OpenCode model frontiers", "",
@@ -192,11 +198,15 @@ def render(version, aa_models, catalogs, date):
              "AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage. "
              "API version excludes patch numbers. [Methodology](README.md).", ""]
     all_offers = {}
+    excluded = {}
     for channel, catalog in catalogs.items():
+        total = len(catalog)
+        if policy is not None:
+            catalog, excluded[channel] = filter_privacy(catalog, channel, policy)
         entries, missing, offers = intersect(catalog, aa_models)
         front = frontier(entries)
         lines += [f"## {channel} frontier", "",
-                  f"**{len(set(e['id'] for e in entries))}/{len(catalog)} endpoints matched · "
+                  f"**{len(set(e['id'] for e in entries))}/{total} endpoints matched · "
                   f"{len(entries)} configurations · {len(front)} frontier points**", ""]
         lines += table(front) + [""]
         if missing:
@@ -211,6 +221,12 @@ def render(version, aa_models, catalogs, date):
             if key not in all_offers:
                 all_offers[key] = (offer, [])
             all_offers[key][1].append(channel)
+    if policy is not None:
+        lines += ["## Privacy filter", "",
+                  f"No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed {policy['verified_on']}."]
+        for channel, ids in excluded.items():
+            lines += [f"- {channel}: " + (", ".join(f"`{mid}`" for mid in sorted(ids)) or "none excluded") + "."]
+        lines += ["Policy sources: " + " · ".join(f"[{channel}]({url})" for channel, url in policy['sources'].items()) + ".", ""]
     lines += ["## Special pricing", "", "OpenCode input/output $ per million tokens; does not alter AA $/task.", "",
               "| Model | Available on | Catalog rates | Regular rates / condition |", "|---|---|---:|---|"]
     free_counts = {}
@@ -247,7 +263,8 @@ def main():
         if not catalog:
             raise ValueError(f"Empty {channel} catalog")
         catalogs[channel] = catalog
-    report = render(version, models, catalogs, datetime.datetime.now(datetime.timezone.utc).date().isoformat())
+    policy = json.loads((HERE / "privacy.json").read_text())
+    report = render(version, models, catalogs, datetime.datetime.now(datetime.timezone.utc).date().isoformat(), policy)
     args.output.write_text(report)
     print(f"Wrote {args.output}")
 
