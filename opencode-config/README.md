@@ -10,7 +10,7 @@
   after either fragment changes. Models owns `providers`/`model`; settings owns
   everything else. Conflicting top-level fields fail, even if values match.
 
-The weekly/manual report opens a PR including `models.json`. After merge, the
+The nightly/manual report opens a PR including `models.json`. After merge, the
 publish workflow validates JSON, OpenCode's published schema, alias targets and
 enablement, then commits `opencode.json`. Source-path filters prevent loops.
 All `providers` configuration currently belongs to the models fragment; MCP,

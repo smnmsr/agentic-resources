@@ -308,6 +308,37 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
     return {"providers": providers}
 
 
+def enabled_ids(models):
+    return {mid for mid, entry in models.items() if "modelID" not in entry and not entry["disabled"]}
+
+
+def pr_body(previous, config):
+    """Describe models.json changes against the previously published file."""
+    lines = ["Regenerated from the latest AA Intelligence Index and OpenCode catalogs. "
+             "Full frontiers and special pricing: `model-curator/MODELS.md`. "
+             "After merge, the config workflow publishes the merged config to enrolled machines.", ""]
+    for provider, block in config["providers"].items():
+        old = previous.get("providers", {}).get(provider, {}).get("models", {})
+        new = block["models"]
+        lines += [f"### {provider}", ""]
+        for alias, entry in new.items():
+            if "modelID" not in entry:
+                continue
+            prior = old.get(alias)
+            if prior == entry:
+                status = "unchanged"
+            elif prior:
+                status = f"was `{prior['modelID']}` ({prior['name']})"
+            else:
+                status = "new"
+            lines.append(f"- `{alias}` → `{entry['modelID']}` ({entry['name']}): {status}")
+        added = sorted(enabled_ids(new) - enabled_ids(old))
+        removed = sorted(enabled_ids(old) - enabled_ids(new))
+        lines += [f"- Newly enabled: {', '.join(f'`{m}`' for m in added) or 'none'}",
+                  f"- Newly disabled: {', '.join(f'`{m}`' for m in removed) or 'none'}", ""]
+    return "\n".join(lines) + "\n"
+
+
 def table(entries):
     lines = ["| # | OpenCode model | AA configuration | Score | AA $/task |",
              "|---:|---|---|---:|---:|"]
@@ -509,6 +540,7 @@ def main():
     parser.add_argument("--output", type=Path, default=HERE / "MODELS.md")
     parser.add_argument("--models-output", type=Path,
                         default=HERE.parent / "opencode-config" / "models.json")
+    parser.add_argument("--pr-body", type=Path, help="Write a PR description of the models.json changes")
     args = parser.parse_args()
     key = os.environ.get("AA_API_KEY")
     opencode_key = os.environ.get("OPENCODE_API_KEY")
@@ -520,10 +552,13 @@ def main():
     policy = json.loads((HERE / "privacy.json").read_text())
     config = model_config(models, catalogs, public_catalogs, policy, fetch(CLIENT_CATALOG_URL))
     report = render(version, models, catalogs, datetime.datetime.now(datetime.timezone.utc).date().isoformat(), policy)
+    previous = json.loads(args.models_output.read_text()) if args.models_output.exists() else {}
     args.output.write_text(report)
     write_plots(models, catalogs, policy, args.output.parent / "plots")
     args.models_output.parent.mkdir(parents=True, exist_ok=True)
     args.models_output.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n")
+    if args.pr_body:
+        args.pr_body.write_text(pr_body(previous, config))
     print(f"Wrote {args.output}")
 
 

@@ -8,7 +8,7 @@ verified US/EU hosting. AA task costs are a comparison proxy, not actual Go usag
 ## Run the workflow
 
 In GitHub, open **Actions → Model Pareto report → Run workflow**.
-It also runs every Monday at 05:30 UTC.
+It also runs every night at 00:42 UTC.
 
 Requires the repository secrets `AA_API_KEY` and `OPENCODE_API_KEY` (a read-only
 OpenCode key; only models its workspace can call are compared). Changed reports

@@ -37,6 +37,25 @@ class CurateTests(unittest.TestCase):
         self.assertEqual(models["curated-strong"]["settings"], {"reasoningEffort": "high"})
         self.assertNotIn("model", config)
 
+    def test_pr_body_describes_actual_changes(self):
+        previous = {"providers": {"opencode-go": {"models": {
+            "claude-haiku-5-5": {"disabled": True}, "gpt-old": {"disabled": False},
+            "curated-small": {"modelID": "gpt-old", "name": "Small — GPT Old", "disabled": False, "settings": {}}}}}}
+        config = {"providers": {"opencode-go": {"models": {
+            "claude-haiku-5-5": {"disabled": False}, "gpt-old": {"disabled": True},
+            "curated-small": {"modelID": "claude-haiku-5-5", "name": "Small — Claude Haiku 5.5",
+                              "disabled": False, "settings": {}},
+            "curated-medium": {"modelID": "claude-haiku-5-5", "name": "Medium — Claude Haiku 5.5",
+                               "disabled": False, "settings": {}}}}}}
+        body = curate.pr_body(previous, config)
+        self.assertIn("- `curated-small` → `claude-haiku-5-5` (Small — Claude Haiku 5.5): was `gpt-old` (Small — GPT Old)", body)
+        self.assertIn("- `curated-medium` → `claude-haiku-5-5` (Medium — Claude Haiku 5.5): new", body)
+        self.assertIn("- Newly enabled: `claude-haiku-5-5`", body)
+        self.assertIn("- Newly disabled: `gpt-old`", body)
+        first_run = curate.pr_body({}, config)
+        self.assertIn("- `curated-small` → `claude-haiku-5-5` (Small — Claude Haiku 5.5): new", first_run)
+        self.assertIn("- Newly disabled: none", first_run)
+
     def test_alias_settings_and_empty_frontier_fail_closed(self):
         for mid, key in (("claude-haiku-5-5", "effort"), ("gemini-4-argon", "thinkingConfig")):
             self.assertIn(key, curate.alias_settings({"id": mid, "effort": "high"}))
