@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-11 · 119 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-11 · 120 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -104,4 +104,4 @@ OpenCode input/output $ per million tokens; does not alter AA $/task.
 
 Free endpoints excluded: 1 Go, 4 Paid.
 
-Sources: [Artificial Analysis](https://artificialanalysis.ai/) · [Go catalog](https://opencode.ai/inference/go/v1/models) · [Paid catalog](https://opencode.ai/inference/v1/models).
+Sources: [Artificial Analysis](https://artificialanalysis.ai/) · [Go catalog](https://opencode.ai/inference/go/v1/models) · [Paid catalog](https://opencode.ai/inference/v1/models), authenticated: workspace-enabled models only.
