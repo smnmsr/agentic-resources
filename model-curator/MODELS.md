@@ -12,6 +12,18 @@ AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage
 
 ![Go Pareto plot](plots/go.svg)
 
+### Curated picks
+
+Score bands: Small <25, Medium <40, Strong ≥40 (lower bounds inclusive). Log-cost upper hull within each band; largest slope drop per band. Candidates less than 3 score points apart keep the cheaper one. Empty bands are omitted; endpoint fallback uses the highest score. These are selection heuristics, not measured score uncertainty.
+
+| Tier | Plot # | AA configuration | Score | AA $/task |
+|---|---:|---|---:|---:|
+| Small | 5 | Claude Haiku 5.5 (Medium) | 24.6 | 0.0918 |
+| Medium | 9 | Claude Haiku 5.5 (Xhigh) | 34.6 | 0.2484 |
+| Strong | 12 | Gemini 4 Argon (High) | 50.4 | 9.9466 |
+
+### Full frontier
+
 | # | OpenCode model | AA configuration | Score | AA $/task |
 |---:|---|---|---:|---:|
 | 1 | `gpt-6-luna` | [GPT-6 Luna (Low)](https://artificialanalysis.ai/models/gpt-6-luna-low) | 9.7 | 0.0051 |
@@ -34,6 +46,19 @@ Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 **26/85 endpoints matched · 65 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
+
+### Curated picks
+
+Score bands: Small <25, Medium <40, Strong <55, Flagship ≥55 (lower bounds inclusive). Log-cost upper hull within each band; largest slope drop per band. Candidates less than 3 score points apart keep the cheaper one. Empty bands are omitted; endpoint fallback uses the highest score. These are selection heuristics, not measured score uncertainty.
+
+| Tier | Plot # | AA configuration | Score | AA $/task |
+|---|---:|---|---:|---:|
+| Small | 5 | Claude Haiku 5.5 (Medium) | 24.6 | 0.0918 |
+| Medium | 8 | GPT-6.1 Sol (Low) | 34.8 | 0.1615 |
+| Strong | 11 | GPT-6.1 Sol (Xhigh) | 52.5 | 0.7640 |
+| Flagship | 15 | Claude Fable 5.2 (Medium, Default Fallback) | 56.4 | 3.8026 |
+
+### Full frontier
 
 | # | OpenCode model | AA configuration | Score | AA $/task |
 |---:|---|---|---:|---:|
