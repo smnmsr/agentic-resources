@@ -89,7 +89,7 @@
           "disabled": true
         },
         "gpt-6-luna": {
-          "disabled": false
+          "disabled": true
         },
         "grok-4.7": {
           "disabled": true
@@ -113,7 +113,7 @@
           "disabled": true
         },
         "kimi-k3.1-pro": {
-          "disabled": false
+          "disabled": true
         },
         "longcat-2.0": {
           "disabled": true
@@ -131,7 +131,7 @@
           "disabled": true
         },
         "mimo-v2.6-flash": {
-          "disabled": false
+          "disabled": true
         },
         "mimo-v2.6-pro": {
           "disabled": true
@@ -222,7 +222,7 @@
           "disabled": true
         },
         "claude-opus-5-5": {
-          "disabled": false
+          "disabled": true
         },
         "claude-sonnet-4": {
           "disabled": true
@@ -450,10 +450,10 @@
           "disabled": true
         },
         "gpt-6-astra": {
-          "disabled": false
+          "disabled": true
         },
         "gpt-6-luna": {
-          "disabled": false
+          "disabled": true
         },
         "gpt-6-sol": {
           "disabled": true
