@@ -17,15 +17,19 @@ def model(mid="example-2", **kwargs):
 
 
 class CurateTests(unittest.TestCase):
-    def test_model_config_disables_nonfrontier_and_preserves_alias_effort(self):
-        catalog = [model("gpt-example"), model("unmatched")]
+    def test_model_config_enables_only_curated_picks(self):
+        catalog = [model("gpt-example"), model("cheap-example"), model("unmatched")]
         catalogs = {"Go": catalog, "Paid": catalog}
         public = {"Go": catalog + [model("public-only")], "Paid": catalog}
-        policy = {"allowed": {channel: ["gpt-example", "unmatched"] for channel in catalogs}}
+        policy = {"allowed": {channel: ["gpt-example", "cheap-example", "unmatched"] for channel in catalogs}}
         client = {p: {"models": {"client-only": {}}} for p in ("opencode", "opencode-go")}
-        config = curate.model_config([aa("GPT Example (High)", "gpt-example-high")], catalogs, public, policy, client)
+        # Both on the frontier and in the same band; only the stronger one is picked.
+        aa_models = [aa("GPT Example (High)", "gpt-example-high", score=50, cost=1),
+                     aa("Cheap Example (Low)", "cheap-example-low", score=42, cost=0.5)]
+        config = curate.model_config(aa_models, catalogs, public, policy, client)
         models = config["providers"]["opencode-go"]["models"]
         self.assertFalse(models["gpt-example"]["disabled"])
+        self.assertTrue(models["cheap-example"]["disabled"])
         self.assertTrue(models["public-only"]["disabled"])
         self.assertTrue(models["unmatched"]["disabled"])
         self.assertTrue(models["client-only"]["disabled"])

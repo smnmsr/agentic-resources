@@ -24,5 +24,6 @@ The shortlist uses fixed score bands: Go <25 / 25–40 / ≥40; Paid adds a
 score versus log₂(cost), then chooses the largest drop in score gain per price
 doubling (or the highest-scoring endpoint if no corner remains). Hull candidates
 less than 3 score points apart retain the cheaper option, including across bands.
-Empty bands stay empty. These editorial defaults are `SELECTION` and
+Empty bands stay empty. Only the picked models stay enabled in `models.json`;
+other frontier models are disabled. These editorial defaults are `SELECTION` and
 `MIN_SCORE_GAP` in `curate.py`, not benchmark confidence intervals.

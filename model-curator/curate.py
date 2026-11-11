@@ -283,7 +283,8 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
         front = frontier(intersect(approved, aa_models)[0])
         if not front:
             raise ValueError(f"No {channel} frontier; refusing to disable every model")
-        enabled = {point["id"] for point in front}
+        picks = shortlist(front, channel)
+        enabled = {point["id"] for _, point in picks}
         known = {m["id"] for m in public_catalogs[channel] + catalog}
         provider_id = "opencode-go" if channel == "Go" else "opencode"
         if client_catalog is not None:
@@ -292,7 +293,7 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
                 raise ValueError(f"Empty {provider_id} client inventory")
             known.update(client_models)
         models = {mid: {"disabled": mid not in enabled} for mid in sorted(known)}
-        for tier, point in shortlist(front, channel):
+        for tier, point in picks:
             alias = f"curated-{tier.lower()}"
             if alias in known:
                 raise ValueError(f"Alias collides with catalog model: {alias}")

@@ -1,7 +1,7 @@
 # Shared OpenCode V2 configuration
 
 - `models.json`: **generated** by `model-curator/curate.py`; do not edit manually.
-  Enables Go/Paid frontier models and adds `curated-small`, `curated-medium`,
+  Enables only the curated pick models (all other models disabled) and adds `curated-small`, `curated-medium`,
   `curated-strong` and (Paid) `curated-flagship` aliases where available. Alias
   defaults use the selected effort; manually selecting a variant can override it.
   No default model is chosen automatically.
