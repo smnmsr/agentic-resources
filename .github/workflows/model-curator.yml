@@ -34,7 +34,9 @@ jobs:
         uses: peter-evans/create-pull-request@v8
         with:
           branch: automation/model-pareto-report
-          add-paths: model-curator/MODELS.md
+          add-paths: |
+            model-curator/MODELS.md
+            model-curator/plots/*.svg
           commit-message: "Update model Pareto report"
           title: "Update OpenCode model Pareto report"
           body: |

@@ -7,6 +7,7 @@ import math
 import os
 from pathlib import Path
 import re
+from xml.sax.saxutils import escape
 import urllib.request
 
 AA_URL = "https://artificialanalysis.ai/api/v2/language/models/free"
@@ -174,13 +175,101 @@ def cell(value):
 
 
 def table(entries):
-    lines = ["| OpenCode model | AA configuration | Score | AA $/task |",
-             "|---|---|---:|---:|"]
-    for entry in entries:
-        lines.append(f"| `{cell(entry['id'])}` | [{cell(entry['aa_name'])}]"
+    lines = ["| # | OpenCode model | AA configuration | Score | AA $/task |",
+             "|---:|---|---|---:|---:|"]
+    for number, entry in enumerate(entries, 1):
+        lines.append(f"| {number} | `{cell(entry['id'])}` | [{cell(entry['aa_name'])}]"
                      f"(https://artificialanalysis.ai/models/{entry['slug']}) | "
                      f"{entry['score']:g} | {entry['cost']:.4f} |")
     return lines if entries else ["No comparable models found."]
+
+
+def svg_plot(entries, title, x_min, x_max, y_max):
+    """Dependency-free SVG XY plot using actual log-scaled cost coordinates."""
+    if x_min >= x_max:
+        x_min, x_max = x_min / math.sqrt(10), x_max * math.sqrt(10)
+    width, height = 960, 500
+    left, right, top, bottom = 82, 24, 54, 68
+    plot_w, plot_h = width - left - right, height - top - bottom
+    log_min, log_max = math.log10(x_min), math.log10(x_max)
+
+    def px(cost):
+        return left + (math.log10(cost) - log_min) / (log_max - log_min) * plot_w
+
+    def py(score):
+        return top + (y_max - score) / y_max * plot_h
+
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+             f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">',
+             '<rect width="100%" height="100%" fill="white"/>',
+             f'<text x="{width / 2:g}" y="30" text-anchor="middle" font-family="sans-serif" '
+             f'font-size="20" font-weight="600">{escape(title)}</text>']
+
+    for score in range(0, y_max + 1, 10):
+        y = py(score)
+        parts += [f'<line x1="{left}" y1="{y:.2f}" x2="{left + plot_w}" y2="{y:.2f}" stroke="#e5e7eb"/>',
+                  f'<text x="{left - 12}" y="{y + 4:.2f}" text-anchor="end" font-family="sans-serif" '
+                  f'font-size="12" fill="#374151">{score}</text>']
+
+    ticks = [x_min]
+    ticks += [10 ** p for p in range(math.ceil(log_min), math.floor(log_max) + 1)]
+    if x_max > ticks[-1] * (1 + 1e-9):
+        ticks.append(x_max)
+    for cost in sorted(set(ticks)):
+        x = px(cost)
+        parts += [f'<line x1="{x:.2f}" y1="{top}" x2="{x:.2f}" y2="{top + plot_h}" stroke="#e5e7eb"/>',
+                  f'<text x="{x:.2f}" y="{top + plot_h + 22}" text-anchor="middle" font-family="sans-serif" '
+                  f'font-size="12" fill="#374151">${cost:.4g}</text>']
+
+    parts += [f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="#111827"/>',
+              f'<line x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_h}" stroke="#111827"/>']
+    ordered = sorted(entries, key=lambda point: point["cost"])
+    coords = " ".join(f'{px(point["cost"]):.2f},{py(point["score"]):.2f}' for point in ordered)
+    if coords:
+        parts.append(f'<polyline points="{coords}" fill="none" stroke="#2563eb" stroke-width="2"/>')
+    positions = [(px(point["cost"]), py(point["score"])) for point in ordered]
+    labels = []
+    for number, (point, (x, y)) in enumerate(zip(ordered, positions), 1):
+        tooltip = escape(f'{number}. {point.get("aa_name", point["id"])}: score {point["score"]:g}, ${point["cost"]:.4f}/task')
+        parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" '
+                     f'r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>{tooltip}</title></circle>')
+        # Place compact numbered labels without covering other labels or points.
+        label_w, label_h = 8 * len(str(number)) + 8, 18
+        candidates = [(dx, dy) for dy in (-24, 10, -44, 30, -64, 50)
+                      for dx in (10, -label_w - 10, -label_w / 2)]
+        for dx, dy in candidates:
+            bx, by = x + dx, y + dy
+            if not (left <= bx and bx + label_w <= left + plot_w
+                    and top <= by and by + label_h <= top + plot_h):
+                continue
+            if any(bx < ox + ow + 3 and bx + label_w + 3 > ox
+                   and by < oy + oh + 3 and by + label_h + 3 > oy
+                   for ox, oy, ow, oh in labels):
+                continue
+            if any(bx - 6 <= ox <= bx + label_w + 6 and by - 6 <= oy <= by + label_h + 6
+                   for ox, oy in positions):
+                continue
+            break
+        else:
+            bx = min(max(x + 10, left), left + plot_w - label_w)
+            by = min(max(y - 24, top), top + plot_h - label_h)
+        labels.append((bx, by, label_w, label_h))
+        parts += [f'<line x1="{x:.2f}" y1="{y:.2f}" x2="{bx + label_w / 2:.2f}" '
+                  f'y2="{by + label_h / 2:.2f}" stroke="#9ca3af" stroke-width="1"/>',
+                  f'<rect x="{bx:.2f}" y="{by:.2f}" width="{label_w}" height="{label_h}" '
+                  'rx="3" fill="white" stroke="#d1d5db"/>',
+                  f'<text x="{bx + label_w / 2:.2f}" y="{by + 13:.2f}" text-anchor="middle" '
+                  f'font-family="sans-serif" font-size="12" fill="#111827">{number}</text>']
+    if not ordered:
+        parts.append(f'<text x="{width / 2:g}" y="{height / 2:g}" text-anchor="middle" '
+                     'font-family="sans-serif">No comparable models</text>')
+    parts += [f'<text x="{left + plot_w / 2:g}" y="{height - 16}" text-anchor="middle" font-family="sans-serif" '
+              'font-size="14" fill="#111827">AA cost per Intelligence Index task (USD, log scale)</text>',
+              f'<text x="20" y="{top + plot_h / 2:g}" text-anchor="middle" font-family="sans-serif" '
+              'font-size="14" fill="#111827" '
+              f'transform="rotate(-90 20 {top + plot_h / 2:g})">AA Intelligence Index score</text>',
+              '</svg>', '']
+    return "\n".join(parts)
 
 
 def filter_privacy(catalog, channel, policy):
@@ -195,6 +284,7 @@ def render(version, aa_models, catalogs, date, policy=None):
     lines = ["# OpenCode model frontiers", "",
              f"**AA Intelligence Index v{version_label} · {date} · {scored} scored configurations**", "",
              "Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.",
+             "Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.",
              "AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage. "
              "API version excludes patch numbers. [Methodology](README.md).", ""]
     all_offers = {}
@@ -208,6 +298,8 @@ def render(version, aa_models, catalogs, date, policy=None):
         lines += [f"## {channel} frontier", "",
                   f"**{len(set(e['id'] for e in entries))}/{total} endpoints matched · "
                   f"{len(entries)} configurations · {len(front)} frontier points**", ""]
+        plot_file = "go.svg" if channel == "Go" else "paid.svg"
+        lines += [f"![{channel} Pareto plot](plots/{plot_file})", ""]
         lines += table(front) + [""]
         if missing:
             reasons = {}
@@ -249,6 +341,24 @@ def render(version, aa_models, catalogs, date, policy=None):
     return "\n".join(lines) + "\n"
 
 
+def write_plots(aa_models, catalogs, policy, plot_dir):
+    chart_data = {}
+    for channel, catalog in catalogs.items():
+        if policy is not None:
+            catalog, _ = filter_privacy(catalog, channel, policy)
+        entries, _, _ = intersect(catalog, aa_models)
+        chart_data[channel] = frontier(entries)
+    points = [point for channel_points in chart_data.values() for point in channel_points]
+    x_min = min((point["cost"] for point in points), default=0.01)
+    x_max = max((point["cost"] for point in points), default=10)
+    y_max = max(10, int(math.ceil(max((point["score"] for point in points), default=10) / 10) * 10))
+    plot_dir.mkdir(parents=True, exist_ok=True)
+    for channel, channel_points in chart_data.items():
+        filename = "go.svg" if channel == "Go" else "paid.svg"
+        (plot_dir / filename).write_text(svg_plot(channel_points, f"{channel} Pareto frontier",
+                                                x_min, x_max, y_max))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=HERE / "MODELS.md")
@@ -266,6 +376,7 @@ def main():
     policy = json.loads((HERE / "privacy.json").read_text())
     report = render(version, models, catalogs, datetime.datetime.now(datetime.timezone.utc).date().isoformat(), policy)
     args.output.write_text(report)
+    write_plots(models, catalogs, policy, args.output.parent / "plots")
     print(f"Wrote {args.output}")
 
 
