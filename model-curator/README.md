@@ -11,11 +11,16 @@ In GitHub, open **Actions → Model Pareto report → Run workflow**.
 It also runs every night at 00:42 UTC.
 
 Requires the repository secrets `AA_API_KEY` and `OPENCODE_API_KEY` (a read-only
-OpenCode key; only models its workspace can call are compared). Changed reports
-open a PR; unchanged reports create none. Results are also shown in the run summary.
+OpenCode key; only models its workspace can call are compared). The workflow commits
+`MODELS.md`, plots, the [model config fragment](../opencode-config/README.md) and merged
+`opencode.json` directly to `main`. Date-only report updates create no commit; other
+report, frontier or inventory changes do. Results also appear in the run summary.
 
-The same PR updates the [model config fragment](../opencode-config/README.md).
-After merge, a separate workflow publishes the merged config for enrolled machines.
+Publication requires at least 50 finite AA scores, unique AA IDs and valid pagination,
+nonempty catalogs and frontiers, existing privacy/effort checks, both test suites and
+merged-config schema validation. Failed runs publish nothing. Pushes using
+`GITHUB_TOKEN` cannot trigger other workflows, so the curator builds the merged config
+itself; the separate config publisher remains for hand-maintained source changes.
 
 ## Selection
 

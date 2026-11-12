@@ -43,23 +43,37 @@ def fetch_catalogs(key):
 
 def fetch_aa(key):
     models, version, page = [], None, 1
+    ids, total_pages = set(), None
     while True:
         data = fetch(f"{AA_URL}?page={page}", {"x-api-key": key})
         current = data["intelligence_index_version"]
         if version is not None and current != version:
             raise ValueError("AA index version changed during pagination; retry the run")
         version = current
-        models.extend(data["data"])
+        for model in data["data"]:
+            if model["id"] in ids:
+                raise ValueError(f"Duplicate AA model ID: {model['id']}")
+            ids.add(model["id"])
+            models.append(model)
         pagination = data["pagination"]
-        if pagination["page"] != page:
+        current_total = pagination["total_pages"]
+        if total_pages is None:
+            total_pages = current_total
+        if (pagination["page"] != page or current_total != total_pages
+                or not isinstance(total_pages, int) or isinstance(total_pages, bool)
+                or not 1 <= page <= total_pages
+                or not isinstance(pagination["has_more"], bool)
+                or pagination["has_more"] != (page < total_pages)
+                or not data["data"]):
             raise ValueError("Unexpected AA pagination")
         if not pagination["has_more"]:
             break
         page += 1
         if page > 100:
             raise ValueError("Unexpected number of AA pages")
-    if not models:
-        raise ValueError("AA returned no models")
+    scored = sum(usable_number(measures(model)[0]) for model in models)
+    if scored < 50:
+        raise ValueError(f"AA returned only {scored} scored configurations; require at least 50")
     return version, models
 
 
@@ -308,37 +322,6 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
     return {"providers": providers}
 
 
-def enabled_aliases(models):
-    return {mid for mid, entry in models.items() if "modelID" in entry and not entry["disabled"]}
-
-
-def pr_body(previous, config):
-    """Describe models.json changes against the previously published file."""
-    lines = ["Regenerated from the latest AA Intelligence Index and OpenCode catalogs. "
-             "Full frontiers and special pricing: `model-curator/MODELS.md`. "
-             "After merge, the config workflow publishes the merged config to enrolled machines.", ""]
-    for provider, block in config["providers"].items():
-        old = previous.get("providers", {}).get(provider, {}).get("models", {})
-        new = block["models"]
-        lines += [f"### {provider}", ""]
-        for alias, entry in new.items():
-            if "modelID" not in entry:
-                continue
-            prior = old.get(alias)
-            if prior == entry:
-                status = "unchanged"
-            elif prior:
-                status = f"was `{prior['modelID']}` ({prior['name']})"
-            else:
-                status = "new"
-            lines.append(f"- `{alias}` → `{entry['modelID']}` ({entry['name']}): {status}")
-        added = sorted(enabled_aliases(new) - enabled_aliases(old))
-        removed = sorted(enabled_aliases(old) - enabled_aliases(new))
-        lines += [f"- Newly enabled: {', '.join(f'`{m}`' for m in added) or 'none'}",
-                  f"- Newly disabled: {', '.join(f'`{m}`' for m in removed) or 'none'}", ""]
-    return "\n".join(lines) + "\n"
-
-
 def table(entries):
     lines = ["| # | OpenCode model | AA configuration | Score | AA $/task |",
              "|---:|---|---|---:|---:|"]
@@ -535,12 +518,19 @@ def write_plots(aa_models, catalogs, policy, plot_dir):
                                                 x_min, x_max, y_max))
 
 
+def write_report(path, report):
+    """Keep the previous report date when its content has not changed."""
+    date = r"(?m)^(\*\*AA Intelligence Index v[^·\n]+ · )\d{4}-\d{2}-\d{2}( · )"
+    if path.exists() and re.sub(date, r"\1\2", path.read_text()) == re.sub(date, r"\1\2", report):
+        return
+    path.write_text(report)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=HERE / "MODELS.md")
     parser.add_argument("--models-output", type=Path,
                         default=HERE.parent / "opencode-config" / "models.json")
-    parser.add_argument("--pr-body", type=Path, help="Write a PR description of the models.json changes")
     args = parser.parse_args()
     key = os.environ.get("AA_API_KEY")
     opencode_key = os.environ.get("OPENCODE_API_KEY")
@@ -552,13 +542,10 @@ def main():
     policy = json.loads((HERE / "privacy.json").read_text())
     config = model_config(models, catalogs, public_catalogs, policy, fetch(CLIENT_CATALOG_URL))
     report = render(version, models, catalogs, datetime.datetime.now(datetime.timezone.utc).date().isoformat(), policy)
-    previous = json.loads(args.models_output.read_text()) if args.models_output.exists() else {}
-    args.output.write_text(report)
+    write_report(args.output, report)
     write_plots(models, catalogs, policy, args.output.parent / "plots")
     args.models_output.parent.mkdir(parents=True, exist_ok=True)
     args.models_output.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n")
-    if args.pr_body:
-        args.pr_body.write_text(pr_body(previous, config))
     print(f"Wrote {args.output}")
 
 

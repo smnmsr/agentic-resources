@@ -13,8 +13,8 @@ Small repo of automation for OpenCode model curation. No package manager; Python
 ## Generated files: do not edit by hand
 
 - `model-curator/MODELS.md`, `model-curator/plots/*.svg`: from `curate.py`.
-- `opencode-config/models.json`: from `curate.py`; reviewed through the report PR.
-- `opencode-config/opencode.json`: from `config.py`; published to `main` by `.github/workflows/opencode-config.yml`.
+- `opencode-config/models.json`: from `curate.py`.
+- `opencode-config/opencode.json`: from `config.py`; published to `main` by the curator or config publish workflow.
 - Changing a fragment means changing the generator or source input, then regenerating.
 
 ## Config ownership
@@ -26,9 +26,10 @@ Small repo of automation for OpenCode model curation. No package manager; Python
 
 ## Publishing and triggers
 
-- The config publish workflow commits generated output directly to `main`. Its path filters exclude that output, so it doesn't retrigger.
-- The report workflow opens a PR using the default token, which does not trigger PR checks. Validation still runs when it is merged to `main`.
-- Pull requests that touch config sources run validation only; publishing happens on push to `main`.
+- Nightly/manual curator commits `MODELS.md`, plots, `models.json` and merged `opencode.json` directly to `main`. Date-only report updates create no commit; other report, frontier or inventory changes do.
+- Publication requires >=50 finite AA scores, unique AA IDs and valid pagination, nonempty catalogs/frontiers, existing privacy/effort checks, both test suites and merged-config schema validation. Failed runs publish nothing.
+- `GITHUB_TOKEN` pushes cannot trigger other workflows, so the curator builds and validates merged config itself.
+- The config publisher remains for hand-maintained source changes; its path filters exclude generated output to prevent loops. Pull requests validate only; publishing happens on push to `main`.
 
 ## Machine sync (macOS/Linux)
 

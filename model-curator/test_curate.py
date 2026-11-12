@@ -1,3 +1,5 @@
+from pathlib import Path
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -5,7 +7,7 @@ import curate
 
 
 def aa(name="Example 2 (High)", slug="example-2-high", score=50, cost=1):
-    return {"name": name, "slug": slug,
+    return {"id": slug, "name": name, "slug": slug,
             "evaluations": {"artificial_analysis_intelligence_index": score},
             "artificial_analysis_intelligence_index_cost": {"cost_per_task": {"total_cost": cost}}}
 
@@ -14,6 +16,12 @@ def model(mid="example-2", **kwargs):
     return {"id": mid, "name": mid, "type": "chat",
             "cost": {"text": {"input": {"price": 1}, "output": {"price": 2}}},
             "capabilities": {"reasoning": {"supported": True, "effort": ["high", "low"]}}, **kwargs}
+
+
+def aa_page(page, total_pages):
+    return {"intelligence_index_version": 5,
+            "data": [aa(slug=f"model-{page}-{i}") for i in range(25)],
+            "pagination": {"page": page, "total_pages": total_pages, "has_more": page < total_pages}}
 
 
 class CurateTests(unittest.TestCase):
@@ -38,25 +46,42 @@ class CurateTests(unittest.TestCase):
         self.assertEqual(models["curated-strong"]["settings"], {"reasoningEffort": "high"})
         self.assertNotIn("model", config)
 
-    def test_pr_body_describes_actual_changes(self):
-        previous = {"providers": {"opencode-go": {"models": {
-            "claude-haiku-5-5": {"disabled": True}, "gpt-old": {"disabled": True},
-            "curated-small": {"modelID": "gpt-old", "name": "Small — GPT Old", "disabled": False, "settings": {}},
-            "curated-flagship": {"modelID": "gpt-old", "name": "Flagship — GPT Old", "disabled": False, "settings": {}}}}}}
-        config = {"providers": {"opencode-go": {"models": {
-            "claude-haiku-5-5": {"disabled": True}, "gpt-old": {"disabled": True},
-            "curated-small": {"modelID": "claude-haiku-5-5", "name": "Small — Claude Haiku 5.5",
-                              "disabled": False, "settings": {}},
-            "curated-medium": {"modelID": "claude-haiku-5-5", "name": "Medium — Claude Haiku 5.5",
-                               "disabled": False, "settings": {}}}}}}
-        body = curate.pr_body(previous, config)
-        self.assertIn("- `curated-small` → `claude-haiku-5-5` (Small — Claude Haiku 5.5): was `gpt-old` (Small — GPT Old)", body)
-        self.assertIn("- `curated-medium` → `claude-haiku-5-5` (Medium — Claude Haiku 5.5): new", body)
-        self.assertIn("- Newly enabled: `curated-medium`", body)
-        self.assertIn("- Newly disabled: `curated-flagship`", body)
-        first_run = curate.pr_body({}, config)
-        self.assertIn("- `curated-small` → `claude-haiku-5-5` (Small — Claude Haiku 5.5): new", first_run)
-        self.assertIn("- Newly disabled: none", first_run)
+    def test_report_ignores_only_generated_date(self):
+        report = curate.render(5, [aa()], {"Go": [model()]}, "2026-11-10")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "MODELS.md"
+            curate.write_report(path, report)
+            self.assertEqual(path.read_text(), report)
+            tomorrow = report.replace(" · 2026-11-10 · ", " · 2026-11-11 · ")
+            curate.write_report(path, tomorrow)
+            self.assertEqual(path.read_text(), report)
+            for changed in (tomorrow.replace("v5.0", "v5.1"),
+                            tomorrow.replace("1 scored", "2 scored"),
+                            tomorrow.replace("| 50 |", "| 51 |"),
+                            tomorrow + "Privacy reviewed 2026-11-11.\n"):
+                path.write_text(report)
+                curate.write_report(path, changed)
+                self.assertEqual(path.read_text(), changed)
+
+    def test_frontier_change_is_written_when_pick_stays_same(self):
+        catalog = [model(), model("cheap-example")]
+        catalogs = {"Go": catalog, "Paid": catalog}
+        policy = {"allowed": {channel: [m["id"] for m in catalog] for channel in catalogs},
+                  "verified_on": "2026-11-10", "sources": {}}
+        before = [aa()]
+        after = before + [aa("Cheap Example (High)", "cheap-example-high", score=45, cost=0.5)]
+        self.assertEqual(curate.shortlist(curate.intersect(catalog, before)[0], "Go"),
+                         curate.shortlist(curate.intersect(catalog, after)[0], "Go"))
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "MODELS.md"
+            plots = Path(directory) / "plots"
+            curate.write_report(path, curate.render(5, before, catalogs, "2026-11-10", policy))
+            curate.write_plots(before, catalogs, policy, plots)
+            old_report, old_plot = path.read_text(), (plots / "go.svg").read_text()
+            curate.write_report(path, curate.render(5, after, catalogs, "2026-11-11", policy))
+            curate.write_plots(after, catalogs, policy, plots)
+            self.assertNotEqual(path.read_text(), old_report)
+            self.assertNotEqual((plots / "go.svg").read_text(), old_plot)
 
     def test_alias_settings_and_empty_frontier_fail_closed(self):
         for mid, key in (("claude-haiku-5-5", "effort"), ("gemini-4-argon", "thinkingConfig")):
@@ -65,6 +90,9 @@ class CurateTests(unittest.TestCase):
             curate.alias_settings({"id": "unknown", "effort": "high"})
         with self.assertRaises(ValueError):
             curate.model_config([], {"Go": []}, {"Go": []}, {"allowed": {"Go": []}})
+        with self.assertRaisesRegex(ValueError, "No Go frontier"):
+            curate.model_config([aa("Unmatched")], {"Go": [model()]}, {"Go": [model()]},
+                                {"allowed": {"Go": ["example-2"]}})
 
     def points(self, values):
         return [{"id": str(i), "slug": str(i), "aa_name": f"Model {i}", "cost": cost, "score": score}
@@ -175,21 +203,59 @@ class CurateTests(unittest.TestCase):
 
     @patch("curate.fetch")
     def test_pagination(self, fetch):
-        fetch.side_effect = [
-            {"intelligence_index_version": 5, "data": [aa()], "pagination": {"page": 1, "has_more": True}},
-            {"intelligence_index_version": 5, "data": [aa()], "pagination": {"page": 2, "has_more": False}},
-        ]
-        self.assertEqual(len(curate.fetch_aa("unused")[1]), 2)
+        fetch.side_effect = [aa_page(1, 2), aa_page(2, 2)]
+        self.assertEqual(len(curate.fetch_aa("unused")[1]), 50)
         self.assertIn("page=2", fetch.call_args.args[0])
 
     @patch("curate.fetch")
-    def test_version_changes_fail(self, fetch):
-        fetch.side_effect = [
-            {"intelligence_index_version": 5, "data": [aa()], "pagination": {"page": 1, "has_more": True}},
-            {"intelligence_index_version": 6, "data": [aa()], "pagination": {"page": 2, "has_more": False}},
+    def test_incomplete_or_inconsistent_collection_fails(self, fetch):
+        second_version = aa_page(2, 2)
+        second_version["intelligence_index_version"] = 6
+        premature_end = aa_page(1, 2)
+        premature_end["pagination"]["has_more"] = False
+        repeated_ids = aa_page(2, 2)
+        repeated_ids["data"] = aa_page(1, 2)["data"]
+        empty_page = aa_page(1, 1)
+        empty_page["data"] = []
+        cases = [
+            [aa_page(1, 1)],  # Only 25 scored configurations.
+            [aa_page(1, 2), second_version],
+            [premature_end],
+            [aa_page(1, 2), aa_page(2, 3)],  # Total changed between pages.
+            [aa_page(2, 2)],  # Wrong starting page.
+            [aa_page(1, 2), repeated_ids],
+            [empty_page],
         ]
-        with self.assertRaises(ValueError):
-            curate.fetch_aa("unused")
+        for pages in cases:
+            with self.subTest(pages=pages), self.assertRaises(ValueError):
+                fetch.side_effect = pages
+                curate.fetch_aa("unused")
+
+    @patch("curate.fetch")
+    def test_score_floor_counts_only_finite_numbers(self, fetch):
+        for invalid in (None, True, "50", float("nan"), float("inf")):
+            with self.subTest(score=invalid):
+                pages = [aa_page(1, 2), aa_page(2, 2)]
+                pages[1]["data"][0]["evaluations"]["artificial_analysis_intelligence_index"] = invalid
+                fetch.side_effect = pages
+                with self.assertRaisesRegex(ValueError, "only 49 scored"):
+                    curate.fetch_aa("unused")
+
+    @patch("curate.fetch")
+    def test_failed_collection_leaves_outputs_untouched(self, fetch):
+        fetch.return_value = aa_page(1, 1)
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "MODELS.md"
+            config = Path(directory) / "models.json"
+            report.write_text("previous report")
+            config.write_text("previous config")
+            with patch.dict("os.environ", {"AA_API_KEY": "test", "OPENCODE_API_KEY": "test"}), patch(
+                "sys.argv", ["curate.py", "--output", str(report), "--models-output", str(config)]
+            ), self.assertRaisesRegex(ValueError, "at least 50"):
+                curate.main()
+            self.assertEqual(report.read_text(), "previous report")
+            self.assertEqual(config.read_text(), "previous config")
+            self.assertFalse((Path(directory) / "plots").exists())
 
     @patch("curate.fetch")
     def test_catalogs_use_workspace_key(self, fetch):

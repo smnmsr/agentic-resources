@@ -10,16 +10,19 @@
   after either fragment changes. Models owns `providers`/`model`; settings owns
   everything else. Conflicting top-level fields fail, even if values match.
 
-The nightly/manual report opens a PR including `models.json`. After merge, the
-publish workflow validates JSON, OpenCode's published schema and that every alias target
-exists, then commits `opencode.json`. Source-path filters prevent loops.
+The nightly/manual curator commits the report, plots, `models.json` and merged
+`opencode.json` directly to `main` after its data checks, both test suites and config
+validation pass (see [publication gates](../model-curator/README.md#run-the-workflow)).
+Validation checks JSON, OpenCode's published schema and that every alias target exists.
+Failed runs publish nothing; date-only report updates create no commit, while other
+report, frontier or inventory changes do. The separate config publisher remains for
+hand-maintained source changes. Source-path filters prevent loops.
 All `providers` configuration currently belongs to the models fragment; MCP,
 permissions and other settings belong to settings. No keys belong in either file.
 Use `{env:...}` for secrets; each machine supplies its own credentials.
 
-Report PRs created with the default `GITHUB_TOKEN` do not trigger PR workflows.
-Validation still runs on publication after merge; do not assume a bot-created PR
-has passed pre-merge config checks.
+Pushes using `GITHUB_TOKEN` cannot trigger other workflows, so the curator builds
+and validates the merged config itself rather than relying on the config publisher.
 
 Enablement combines authenticated/public inference catalogs and the published
 models.dev client inventory. It is a snapshot, not a server-side access restriction.
