@@ -363,6 +363,9 @@
         "gemini-4-carbon": {
           "disabled": true
         },
+        "gemini-4-hydrogen": {
+          "disabled": true
+        },
         "glm-4.6": {
           "disabled": true
         },
