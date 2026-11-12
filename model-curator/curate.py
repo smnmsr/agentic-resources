@@ -284,7 +284,6 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
         if not front:
             raise ValueError(f"No {channel} frontier; refusing to disable every model")
         picks = shortlist(front, channel)
-        enabled = {point["id"] for _, point in picks}
         known = {m["id"] for m in public_catalogs[channel] + catalog}
         provider_id = "opencode-go" if channel == "Go" else "opencode"
         if client_catalog is not None:
@@ -292,7 +291,8 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
             if not client_models:
                 raise ValueError(f"Empty {provider_id} client inventory")
             known.update(client_models)
-        models = {mid: {"disabled": mid not in enabled} for mid in sorted(known)}
+        # Base models stay disabled so the picker shows only aliases; aliases resolve from the catalog.
+        models = {mid: {"disabled": True} for mid in sorted(known)}
         for tier, point in picks:
             alias = f"curated-{tier.lower()}"
             if alias in known:
@@ -308,8 +308,8 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
     return {"providers": providers}
 
 
-def enabled_ids(models):
-    return {mid for mid, entry in models.items() if "modelID" not in entry and not entry["disabled"]}
+def enabled_aliases(models):
+    return {mid for mid, entry in models.items() if "modelID" in entry and not entry["disabled"]}
 
 
 def pr_body(previous, config):
@@ -332,8 +332,8 @@ def pr_body(previous, config):
             else:
                 status = "new"
             lines.append(f"- `{alias}` → `{entry['modelID']}` ({entry['name']}): {status}")
-        added = sorted(enabled_ids(new) - enabled_ids(old))
-        removed = sorted(enabled_ids(old) - enabled_ids(new))
+        added = sorted(enabled_aliases(new) - enabled_aliases(old))
+        removed = sorted(enabled_aliases(old) - enabled_aliases(new))
         lines += [f"- Newly enabled: {', '.join(f'`{m}`' for m in added) or 'none'}",
                   f"- Newly disabled: {', '.join(f'`{m}`' for m in removed) or 'none'}", ""]
     return "\n".join(lines) + "\n"

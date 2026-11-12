@@ -34,6 +34,8 @@ class ConfigTests(unittest.TestCase):
         config.validate(document(), {})
         data = document()
         data["providers"]["opencode"]["models"]["base"] = {"disabled": True}
+        config.validate(data, {})  # Aliases resolve from the catalog, so a disabled target is valid.
+        data["providers"]["opencode"]["models"]["curated-small"] = {"modelID": "missing", "disabled": False}
         with self.assertRaises(ValueError):
             config.validate(data, {})
         with self.assertRaises(ValueError):

@@ -62,9 +62,9 @@ def validate(document, schema=None):
             if not isinstance(model.get("disabled"), bool):
                 raise ValueError(f"Missing explicit enablement: {provider}/{mid}")
             if mid.startswith("curated-"):
-                target = models.get(model.get("modelID"))
-                if target is None or target.get("disabled") is not False:
-                    raise ValueError(f"Alias target unavailable: {provider}/{mid}")
+                # Aliases resolve their target from the catalog, so the target only has to exist here.
+                if model.get("modelID") not in models:
+                    raise ValueError(f"Alias target missing: {provider}/{mid}")
     default = document.get("model")
     if default is not None:
         if not isinstance(default, str) or "/" not in default or "#" in default:

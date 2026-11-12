@@ -17,7 +17,7 @@ def model(mid="example-2", **kwargs):
 
 
 class CurateTests(unittest.TestCase):
-    def test_model_config_enables_only_curated_picks(self):
+    def test_model_config_enables_only_curated_aliases(self):
         catalog = [model("gpt-example"), model("cheap-example"), model("unmatched")]
         catalogs = {"Go": catalog, "Paid": catalog}
         public = {"Go": catalog + [model("public-only")], "Paid": catalog}
@@ -28,7 +28,8 @@ class CurateTests(unittest.TestCase):
                      aa("Cheap Example (Low)", "cheap-example-low", score=42, cost=0.5)]
         config = curate.model_config(aa_models, catalogs, public, policy, client)
         models = config["providers"]["opencode-go"]["models"]
-        self.assertFalse(models["gpt-example"]["disabled"])
+        self.assertEqual([mid for mid, entry in models.items() if not entry["disabled"]], ["curated-strong"])
+        self.assertTrue(models["gpt-example"]["disabled"])
         self.assertTrue(models["cheap-example"]["disabled"])
         self.assertTrue(models["public-only"]["disabled"])
         self.assertTrue(models["unmatched"]["disabled"])
@@ -39,10 +40,11 @@ class CurateTests(unittest.TestCase):
 
     def test_pr_body_describes_actual_changes(self):
         previous = {"providers": {"opencode-go": {"models": {
-            "claude-haiku-5-5": {"disabled": True}, "gpt-old": {"disabled": False},
-            "curated-small": {"modelID": "gpt-old", "name": "Small — GPT Old", "disabled": False, "settings": {}}}}}}
+            "claude-haiku-5-5": {"disabled": True}, "gpt-old": {"disabled": True},
+            "curated-small": {"modelID": "gpt-old", "name": "Small — GPT Old", "disabled": False, "settings": {}},
+            "curated-flagship": {"modelID": "gpt-old", "name": "Flagship — GPT Old", "disabled": False, "settings": {}}}}}}
         config = {"providers": {"opencode-go": {"models": {
-            "claude-haiku-5-5": {"disabled": False}, "gpt-old": {"disabled": True},
+            "claude-haiku-5-5": {"disabled": True}, "gpt-old": {"disabled": True},
             "curated-small": {"modelID": "claude-haiku-5-5", "name": "Small — Claude Haiku 5.5",
                               "disabled": False, "settings": {}},
             "curated-medium": {"modelID": "claude-haiku-5-5", "name": "Medium — Claude Haiku 5.5",
@@ -50,8 +52,8 @@ class CurateTests(unittest.TestCase):
         body = curate.pr_body(previous, config)
         self.assertIn("- `curated-small` → `claude-haiku-5-5` (Small — Claude Haiku 5.5): was `gpt-old` (Small — GPT Old)", body)
         self.assertIn("- `curated-medium` → `claude-haiku-5-5` (Medium — Claude Haiku 5.5): new", body)
-        self.assertIn("- Newly enabled: `claude-haiku-5-5`", body)
-        self.assertIn("- Newly disabled: `gpt-old`", body)
+        self.assertIn("- Newly enabled: `curated-medium`", body)
+        self.assertIn("- Newly disabled: `curated-flagship`", body)
         first_run = curate.pr_body({}, config)
         self.assertIn("- `curated-small` → `claude-haiku-5-5` (Small — Claude Haiku 5.5): new", first_run)
         self.assertIn("- Newly disabled: none", first_run)

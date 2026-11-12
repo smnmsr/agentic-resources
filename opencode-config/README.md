@@ -1,8 +1,8 @@
 # Shared OpenCode V2 configuration
 
 - `models.json`: **generated** by `model-curator/curate.py`; do not edit manually.
-  Enables only the curated pick models (all other models disabled) and adds `curated-small`, `curated-medium`,
-  `curated-strong` and (Paid) `curated-flagship` aliases where available. Alias
+  Disables every catalog model and enables only the `curated-small`, `curated-medium`,
+  `curated-strong` and (Paid) `curated-flagship` aliases where available, so the picker shows only those. Alias
   defaults use the selected effort; manually selecting a variant can override it.
   No default model is chosen automatically.
 - `settings.json`: hand-maintained non-model settings; initially empty.
@@ -11,8 +11,8 @@
   everything else. Conflicting top-level fields fail, even if values match.
 
 The nightly/manual report opens a PR including `models.json`. After merge, the
-publish workflow validates JSON, OpenCode's published schema, alias targets and
-enablement, then commits `opencode.json`. Source-path filters prevent loops.
+publish workflow validates JSON, OpenCode's published schema and that every alias target
+exists, then commits `opencode.json`. Source-path filters prevent loops.
 All `providers` configuration currently belongs to the models fragment; MCP,
 permissions and other settings belong to settings. No keys belong in either file.
 Use `{env:...}` for secrets; each machine supplies its own credentials.
