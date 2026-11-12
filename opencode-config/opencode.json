@@ -13,7 +13,7 @@
           "disabled": true
         },
         "claude-haiku-5-5": {
-          "disabled": false
+          "disabled": true
         },
         "crouton-alpha-free": {
           "disabled": true
@@ -75,7 +75,7 @@
           "disabled": true
         },
         "gemini-4-argon": {
-          "disabled": false
+          "disabled": true
         },
         "gemini-4-argon-contributor": {
           "disabled": true
@@ -199,13 +199,13 @@
           "disabled": true
         },
         "claude-fable-5-2": {
-          "disabled": false
+          "disabled": true
         },
         "claude-haiku-4-5": {
           "disabled": true
         },
         "claude-haiku-5-5": {
-          "disabled": false
+          "disabled": true
         },
         "claude-opus-4-1": {
           "disabled": true
@@ -463,7 +463,7 @@
           "disabled": true
         },
         "gpt-6.1-sol": {
-          "disabled": false
+          "disabled": true
         },
         "grok-4.5": {
           "disabled": true
