@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-12 · 126 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-13 · 126 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -20,7 +20,7 @@ Score bands: Small <25, Medium <40, Strong ≥40 (lower bounds inclusive). Log-c
 |---|---:|---|---:|---:|
 | Small | 5 | Claude Haiku 5.5 (Medium) | 24.6 | 0.0918 |
 | Medium | 9 | Claude Haiku 5.5 (Xhigh) | 34.6 | 0.2484 |
-| Strong | 12 | Gemini 4 Argon (High) | 50.4 | 9.9466 |
+| Strong | 12 | Gemini 4 Argon (High) | 50.4 | 4.9733 |
 
 ### Full frontier
 
@@ -37,7 +37,7 @@ Score bands: Small <25, Medium <40, Strong ≥40 (lower bounds inclusive). Log-c
 | 9 | `claude-haiku-5-5` | [Claude Haiku 5.5 (Xhigh)](https://artificialanalysis.ai/models/claude-haiku-5-5-xhigh) | 34.6 | 0.2484 |
 | 10 | `claude-haiku-5-5` | [Claude Haiku 5.5 (Max)](https://artificialanalysis.ai/models/claude-haiku-5-5) | 36.5 | 0.4110 |
 | 11 | `kimi-k3.1-pro` | [Kimi K3.1 Pro](https://artificialanalysis.ai/models/kimi-k3-1-pro) | 46.5 | 3.6812 |
-| 12 | `gemini-4-argon` | [Gemini 4 Argon (High)](https://artificialanalysis.ai/models/gemini-4-argon) | 50.4 | 9.9466 |
+| 12 | `gemini-4-argon` | [Gemini 4 Argon (High)](https://artificialanalysis.ai/models/gemini-4-argon) | 50.4 | 4.9733 |
 
 Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported effort.
 
