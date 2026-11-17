@@ -29,6 +29,8 @@ The shortlist uses fixed score bands: Go <25 / 25–40 / ≥40; Paid adds a
 score versus log₂(cost), then chooses the largest drop in score gain per price
 doubling (or the highest-scoring endpoint if no corner remains). Hull candidates
 less than 3 score points apart retain the cheaper option, including across bands.
-Empty bands stay empty. In `models.json` only the `curated-*` aliases are enabled;
-every catalog model, including the picked ones, is disabled. These editorial defaults
+Empty bands stay empty. In `models.json` only the channel-prefixed aliases (for
+example, `go-small` and `paid-strong`) are enabled, displayed as `Go Small` and
+`Paid Strong` without the underlying model name. Every catalog model, including
+the picked ones, is disabled. Alias settings stay fixed; no default model is set. These editorial defaults
 are `SELECTION` and `MIN_SCORE_GAP` in `curate.py`, not benchmark confidence intervals.

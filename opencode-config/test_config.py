@@ -10,7 +10,7 @@ import sync
 
 def document():
     models = {"base": {"disabled": False}, "old": {"disabled": True},
-              "curated-small": {"modelID": "base", "disabled": False}}
+              "small": {"modelID": "base", "disabled": False}}
     return {"providers": {provider: {"models": models.copy()}
                           for provider in ("opencode", "opencode-go")}}
 
@@ -35,7 +35,7 @@ class ConfigTests(unittest.TestCase):
         data = document()
         data["providers"]["opencode"]["models"]["base"] = {"disabled": True}
         config.validate(data, {})  # Aliases resolve from the catalog, so a disabled target is valid.
-        data["providers"]["opencode"]["models"]["curated-small"] = {"modelID": "missing", "disabled": False}
+        data["providers"]["opencode"]["models"]["small"] = {"modelID": "missing", "disabled": False}
         with self.assertRaises(ValueError):
             config.validate(data, {})
         with self.assertRaises(ValueError):
@@ -44,6 +44,113 @@ class ConfigTests(unittest.TestCase):
         data["model"] = "opencode/missing"
         with self.assertRaises(ValueError):
             config.validate(data, {})
+
+    def test_agent_fragments_and_prompt_inlining(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory = Path(root)
+            (directory / "agents").mkdir()
+            (directory / "prompts").mkdir()
+            prompt = directory / "prompts/review.md"
+            prompt.write_text("Review callers.\n")
+            fragment = directory / "agents/reviewer.json"
+            fragment.write_text(json.dumps({"agents": {"reviewer": {
+                "system": "{file:prompts/review.md}", "model": "opencode/small"}}}))
+            settings = {"plugins": ["example"]}
+            assembled = config.agent_settings(directory, settings)
+            self.assertEqual(assembled["agents"]["reviewer"]["system"], "Review callers.")
+            self.assertEqual(settings, {"plugins": ["example"]})
+            with self.assertRaisesRegex(ValueError, "Duplicate agents"):
+                config.agent_settings(directory, {"agents": {"reviewer": {}}})
+            (directory / "agents/duplicate.json").write_text(fragment.read_text())
+            with self.assertRaisesRegex(ValueError, "Duplicate agents"):
+                config.agent_settings(directory, {})
+            (directory / "agents/duplicate.json").unlink()
+            prompt.write_text("  \n")
+            with self.assertRaisesRegex(ValueError, "Empty prompt"):
+                config.agent_settings(directory, {})
+            prompt.unlink()
+            with self.assertRaises(FileNotFoundError):
+                config.agent_settings(directory, {})
+            fragment.write_text('{"agents":{"reviewer":{"system":"{file:../secret}"}}}')
+            with self.assertRaisesRegex(ValueError, "outside prompts"):
+                config.agent_settings(directory, {})
+            (directory / "secret").write_text("outside prompt root")
+            prompt.symlink_to(directory / "secret")
+            fragment.write_text('{"agents":{"reviewer":{"system":"{file:prompts/review.md}"}}}')
+            with self.assertRaisesRegex(ValueError, "outside prompts"):
+                config.agent_settings(directory, {})
+            fragment.write_text('{"agents":{"reviewer":{"system":"prefix {file:prompts/review.md}"}}}')
+            with self.assertRaisesRegex(ValueError, "Unresolved prompt"):
+                config.agent_settings(directory, {})
+            fragment.write_text('{"plugins":[]}')
+            with self.assertRaisesRegex(ValueError, "Expected an agents"):
+                config.agent_settings(directory, {})
+
+    def test_agent_model_validation(self):
+        for reference in ("opencode/missing", "opencode/old", "broken", "opencode/small#high"):
+            data = document()
+            data["agents"] = {"reviewer": {"model": reference}}
+            with self.subTest(reference=reference), self.assertRaises(ValueError):
+                config.validate(data, {})
+        data["agents"]["reviewer"]["model"] = "opencode/small"
+        config.validate(data, {})
+
+    def test_shipped_agents_routing_and_permissions(self):
+        directory = Path(__file__).resolve().parent
+        settings = config.agent_settings(directory, config.decode((directory / "settings.json").read_bytes()))
+        agents = settings["agents"]
+        self.assertEqual(settings["experimental"]["subagent_depth"], 2)
+        self.assertEqual(set(agents), {"explore", "explore-paid", "general", "general-paid",
+                                       "reviewer", "reviewer-paid", "title", "summary"})
+        from fnmatch import fnmatchcase
+
+        def effect(agent, action, resource):
+            return next((rule["effect"] for rule in reversed(agent["permissions"])
+                         if fnmatchcase(action, rule["action"]) and fnmatchcase(resource, rule["resource"])), None)
+
+        for role, tier in (("explore", "small"), ("general", "medium"), ("reviewer", "strong")):
+            go, paid = agents[role], agents[role + "-paid"]
+            self.assertEqual(go["model"], f"opencode-go/go-{tier}")
+            self.assertEqual(paid["model"], f"opencode/paid-{tier}")
+            self.assertEqual(go["system"], paid["system"])
+            self.assertNotIn("{file:", go["system"])
+            self.assertIn("METERED", paid["description"])
+            for agent in (go, paid):
+                self.assertEqual(effect(agent, "subagent", "reviewer"), "deny")
+                if role != "general":
+                    self.assertEqual(effect(agent, "edit", "file.py"), "deny")
+                    self.assertEqual(effect(agent, "shell", "git diff --output=file.py"), "deny")
+                    self.assertEqual(effect(agent, "read", ".env"), "ask")
+                self.assertEqual(effect(agent, "subagent", "explore"),
+                                 "allow" if role == "reviewer" else "deny")
+        self.assertIn("MIT License", agents["reviewer"]["system"])
+        self.assertEqual(agents["title"]["model"], "opencode-go/go-small")
+        self.assertEqual(agents["summary"]["model"], "opencode-go/go-small")
+
+    def test_build_inlines_prompts_and_validates_references(self):
+        source = Path(__file__).resolve().parent
+        settings = config.agent_settings(source, config.decode((source / "settings.json").read_bytes()))
+        models = {"providers": {provider: {"models": {
+            "base": {"disabled": True},
+            **{f"{channel}-{tier}": {"disabled": False, "modelID": "base"}
+               for tier in ("small", "medium", "strong")}}}
+            for provider, channel in (("opencode-go", "go"), ("opencode", "paid"))}}
+        with tempfile.TemporaryDirectory() as root:
+            directory = Path(root)
+            (directory / "models.json").write_text(json.dumps(models))
+            (directory / "settings.json").write_text(json.dumps(settings))
+            with patch("config.download", return_value=b'{}'):
+                output = config.build(directory)
+            built = config.decode(output.read_bytes())
+            self.assertEqual(built["agents"], settings["agents"])
+            self.assertNotIn("{file:", output.read_text())
+            previous = output.read_bytes()
+            del models["providers"]["opencode-go"]["models"]["go-small"]
+            (directory / "models.json").write_text(json.dumps(models))
+            with patch("config.download", return_value=b'{}'):
+                with self.assertRaisesRegex(ValueError, "Agent model is not enabled"):
+                    config.build(directory)
+            self.assertEqual(output.read_bytes(), previous)
 
     def test_schema_validation(self):
         import jsonschema

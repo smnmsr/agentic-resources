@@ -1,0 +1,42 @@
+{
+  "agents": {
+    "explore": {
+      "mode": "subagent",
+      "model": "opencode-go/go-small",
+      "description": "Default Go Small explorer. Use for routine file, symbol, caller and documentation discovery; read-only. Prefer this over expensive review or Paid agents for lookups.",
+      "system": "{file:prompts/explore.md}",
+      "steps": 15,
+      "permissions": [
+        {"action": "*", "resource": "*", "effect": "deny"},
+        {"action": "read", "resource": "*", "effect": "allow"},
+        {"action": "read", "resource": "*.env", "effect": "ask"},
+        {"action": "read", "resource": "*.env.*", "effect": "ask"},
+        {"action": "read", "resource": "*.env.example", "effect": "allow"},
+        {"action": "external_directory", "resource": "*", "effect": "ask"},
+        {"action": "glob", "resource": "*", "effect": "allow"},
+        {"action": "grep", "resource": "*", "effect": "allow"},
+        {"action": "webfetch", "resource": "*", "effect": "allow"},
+        {"action": "websearch", "resource": "*", "effect": "allow"}
+      ]
+    },
+    "explore-paid": {
+      "mode": "subagent",
+      "model": "opencode/paid-small",
+      "description": "METERED Paid Small explorer. Use only on explicit request or justified Go unavailability; do not automatically escalate. Prefer explore for routine discovery. Read-only.",
+      "system": "{file:prompts/explore.md}",
+      "steps": 15,
+      "permissions": [
+        {"action": "*", "resource": "*", "effect": "deny"},
+        {"action": "read", "resource": "*", "effect": "allow"},
+        {"action": "read", "resource": "*.env", "effect": "ask"},
+        {"action": "read", "resource": "*.env.*", "effect": "ask"},
+        {"action": "read", "resource": "*.env.example", "effect": "allow"},
+        {"action": "external_directory", "resource": "*", "effect": "ask"},
+        {"action": "glob", "resource": "*", "effect": "allow"},
+        {"action": "grep", "resource": "*", "effect": "allow"},
+        {"action": "webfetch", "resource": "*", "effect": "allow"},
+        {"action": "websearch", "resource": "*", "effect": "allow"}
+      ]
+    }
+  }
+}

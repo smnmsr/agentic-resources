@@ -308,11 +308,11 @@ def model_config(aa_models, catalogs, public_catalogs, policy, client_catalog=No
         # Base models stay disabled so the picker shows only aliases; aliases resolve from the catalog.
         models = {mid: {"disabled": True} for mid in sorted(known)}
         for tier, point in picks:
-            alias = f"curated-{tier.lower()}"
+            alias = f"{channel.lower()}-{tier.lower()}"
             if alias in known:
                 raise ValueError(f"Alias collides with catalog model: {alias}")
             models[alias] = {
-                "modelID": point["id"], "name": f"{tier} — {point['aa_name']}",
+                "modelID": point["id"], "name": f"{channel} {tier}",
                 "disabled": False, "settings": alias_settings(point),
             }
             if point["effort"] is not None:

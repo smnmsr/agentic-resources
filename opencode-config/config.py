@@ -61,7 +61,7 @@ def validate(document, schema=None):
         for mid, model in models.items():
             if not isinstance(model.get("disabled"), bool):
                 raise ValueError(f"Missing explicit enablement: {provider}/{mid}")
-            if mid.startswith("curated-"):
+            if "modelID" in model:
                 # Aliases resolve their target from the catalog, so the target only has to exist here.
                 if model.get("modelID") not in models:
                     raise ValueError(f"Alias target missing: {provider}/{mid}")
@@ -73,11 +73,51 @@ def validate(document, schema=None):
         model = document.get("providers", {}).get(provider, {}).get("models", {}).get(mid)
         if model is None or model.get("disabled") is not False:
             raise ValueError("Default model is not enabled in the generated inventory")
+    validate_agents(document)
+
+
+def agent_settings(directory, settings):
+    agents = dict(settings.get("agents", {}))
+    for path in sorted((directory / "agents").glob("*.json")):
+        fragment = decode(path.read_bytes())
+        if set(fragment) != {"agents"} or not isinstance(fragment["agents"], dict):
+            raise ValueError(f"Expected an agents object: {path}")
+        overlap = agents.keys() & fragment["agents"].keys()
+        if overlap:
+            raise ValueError(f"Duplicate agents: {sorted(overlap)}")
+        agents.update(fragment["agents"])
+    root = (directory / "prompts").resolve()
+    for name, definition in agents.items():
+        agent = agents[name] = dict(definition)
+        system = agent.get("system", "")
+        if system.startswith("{file:") and system.endswith("}"):
+            path = (directory / system[6:-1]).resolve()
+            if not path.is_relative_to(root):
+                raise ValueError(f"Prompt outside prompts directory: {name}")
+            agent["system"] = path.read_text().strip()
+            if not agent["system"]:
+                raise ValueError(f"Empty prompt: {name}")
+        if "{file:" in agent.get("system", ""):
+            raise ValueError(f"Unresolved prompt reference: {name}")
+    return {**settings, "agents": agents} if agents else settings
+
+
+def validate_agents(document):
+    agents = document.get("agents", {})
+    for name, agent in agents.items():
+        reference = agent.get("model")
+        if reference is not None:
+            if not isinstance(reference, str) or "/" not in reference or "#" in reference:
+                raise ValueError(f"Expected provider/model for agent: {name}")
+            provider, mid = reference.split("/", 1)
+            model = document.get("providers", {}).get(provider, {}).get("models", {}).get(mid)
+            if model is None or model.get("disabled") is not False:
+                raise ValueError(f"Agent model is not enabled: {name}: {reference}")
 
 
 def build(directory):
     document = merge(decode((directory / "models.json").read_bytes()),
-                     decode((directory / "settings.json").read_bytes()))
+                     agent_settings(directory, decode((directory / "settings.json").read_bytes())))
     validate(document)
     output = directory / "opencode.json"
     output.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n")

@@ -35,15 +35,17 @@ class CurateTests(unittest.TestCase):
         aa_models = [aa("GPT Example (High)", "gpt-example-high", score=50, cost=1),
                      aa("Cheap Example (Low)", "cheap-example-low", score=42, cost=0.5)]
         config = curate.model_config(aa_models, catalogs, public, policy, client)
-        models = config["providers"]["opencode-go"]["models"]
-        self.assertEqual([mid for mid, entry in models.items() if not entry["disabled"]], ["curated-strong"])
-        self.assertTrue(models["gpt-example"]["disabled"])
-        self.assertTrue(models["cheap-example"]["disabled"])
-        self.assertTrue(models["public-only"]["disabled"])
-        self.assertTrue(models["unmatched"]["disabled"])
-        self.assertTrue(models["client-only"]["disabled"])
-        self.assertEqual(models["curated-strong"]["modelID"], "gpt-example")
-        self.assertEqual(models["curated-strong"]["settings"], {"reasoningEffort": "high"})
+        for channel, provider in (("Go", "opencode-go"), ("Paid", "opencode")):
+            with self.subTest(channel=channel):
+                models = config["providers"][provider]["models"]
+                alias = f"{channel.lower()}-strong"
+                self.assertEqual([mid for mid, entry in models.items() if not entry["disabled"]], [alias])
+                for mid in ("gpt-example", "cheap-example", "unmatched", "client-only"):
+                    self.assertTrue(models[mid]["disabled"])
+                self.assertEqual(models[alias]["modelID"], "gpt-example")
+                self.assertEqual(models[alias]["name"], f"{channel} Strong")
+                self.assertEqual(models[alias]["settings"], {"reasoningEffort": "high"})
+        self.assertTrue(config["providers"]["opencode-go"]["models"]["public-only"]["disabled"])
         self.assertNotIn("model", config)
 
     def test_report_ignores_only_generated_date(self):

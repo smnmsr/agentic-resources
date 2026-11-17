@@ -1,0 +1,48 @@
+{
+  "agents": {
+    "reviewer": {
+      "mode": "subagent",
+      "model": "opencode-go/go-strong",
+      "description": "Go Strong independent read-only reviewer. Higher resource use: reserve for substantive or high-risk changes, not trivial lookups or automatic repeated reviews. May delegate targeted searches to explore.",
+      "system": "{file:prompts/reviewer.md}",
+      "steps": 25,
+      "permissions": [
+        {"action": "*", "resource": "*", "effect": "deny"},
+        {"action": "read", "resource": "*", "effect": "allow"},
+        {"action": "read", "resource": "*.env", "effect": "ask"},
+        {"action": "read", "resource": "*.env.*", "effect": "ask"},
+        {"action": "read", "resource": "*.env.example", "effect": "allow"},
+        {"action": "external_directory", "resource": "*", "effect": "ask"},
+        {"action": "glob", "resource": "*", "effect": "allow"},
+        {"action": "grep", "resource": "*", "effect": "allow"},
+        {"action": "shell", "resource": "git --no-pager --no-optional-locks -c core.fsmonitor=false diff --no-ext-diff --no-textconv", "effect": "allow"},
+        {"action": "shell", "resource": "git --no-pager --no-optional-locks -c core.fsmonitor=false diff --no-ext-diff --no-textconv --cached", "effect": "allow"},
+        {"action": "shell", "resource": "git --no-pager --no-optional-locks -c core.fsmonitor=false diff --no-ext-diff --no-textconv HEAD~1 HEAD", "effect": "allow"},
+        {"action": "subagent", "resource": "explore", "effect": "allow"},
+        {"action": "subagent", "resource": "explore-paid", "effect": "allow"}
+      ]
+    },
+    "reviewer-paid": {
+      "mode": "subagent",
+      "model": "opencode/paid-strong",
+      "description": "EXPENSIVE, METERED Paid Strong read-only reviewer. Use only on explicit request or justified need for substantive review; prefer reviewer. Never use for trivial changes or automatic review loops.",
+      "system": "{file:prompts/reviewer.md}",
+      "steps": 25,
+      "permissions": [
+        {"action": "*", "resource": "*", "effect": "deny"},
+        {"action": "read", "resource": "*", "effect": "allow"},
+        {"action": "read", "resource": "*.env", "effect": "ask"},
+        {"action": "read", "resource": "*.env.*", "effect": "ask"},
+        {"action": "read", "resource": "*.env.example", "effect": "allow"},
+        {"action": "external_directory", "resource": "*", "effect": "ask"},
+        {"action": "glob", "resource": "*", "effect": "allow"},
+        {"action": "grep", "resource": "*", "effect": "allow"},
+        {"action": "shell", "resource": "git --no-pager --no-optional-locks -c core.fsmonitor=false diff --no-ext-diff --no-textconv", "effect": "allow"},
+        {"action": "shell", "resource": "git --no-pager --no-optional-locks -c core.fsmonitor=false diff --no-ext-diff --no-textconv --cached", "effect": "allow"},
+        {"action": "shell", "resource": "git --no-pager --no-optional-locks -c core.fsmonitor=false diff --no-ext-diff --no-textconv HEAD~1 HEAD", "effect": "allow"},
+        {"action": "subagent", "resource": "explore", "effect": "allow"},
+        {"action": "subagent", "resource": "explore-paid", "effect": "allow"}
+      ]
+    }
+  }
+}

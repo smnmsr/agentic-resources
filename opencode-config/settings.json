@@ -1,5 +1,8 @@
 {
   "plugins": [
     "@dietrichgebert/ponytail"
-  ]
+  ],
+  "experimental": {
+    "subagent_depth": 2
+  }
 }

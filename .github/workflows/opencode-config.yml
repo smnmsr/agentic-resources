@@ -7,6 +7,8 @@ on:
     paths:
       - opencode-config/models.json
       - opencode-config/settings.json
+      - opencode-config/agents/**
+      - opencode-config/prompts/**
       - opencode-config/config.py
       - opencode-config/requirements.txt
       - .github/workflows/opencode-config.yml

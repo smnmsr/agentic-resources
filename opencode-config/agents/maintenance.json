@@ -1,0 +1,6 @@
+{
+  "agents": {
+    "title": {"model": "opencode-go/go-small"},
+    "summary": {"model": "opencode-go/go-small"}
+  }
+}

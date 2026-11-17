@@ -19,9 +19,9 @@ Small repo of automation for OpenCode model curation. No package manager; Python
 
 ## Config ownership
 
-- `models.json` owns `providers` and the default `model`; `settings.json` owns everything else. Conflicting top-level fields fail the merge.
+- `models.json` owns `providers` and the default `model`; `settings.json` owns other settings. `agents/*.json` contributes native V2 `agents` entries; duplicate agent IDs fail the merge. Local `system` prompt references are inlined from `prompts/` before publishing.
 - Model enablement is an explicit per-model `disabled` list. In V2.2.7 `"*": {"disabled": true}` does not work for models.
-- Aliases (`curated-*`) have fixed effort mappings in `alias_settings()`, tied to `packages/core/src/variant.ts` at `anomalyco/opencode` commit `fedc6f2` (v2.2.7). Unknown model families fail closed; add a mapping only after checking that source.
+- Aliases (`go-*` / `paid-*`, detected by `modelID` rather than prefix) have fixed effort mappings in `alias_settings()`, tied to `packages/core/src/variant.ts` at `anomalyco/opencode` commit `fedc6f2` (v2.2.7). Unknown model families fail closed; add a mapping only after checking that source.
 - Only V2 config fields are valid. Don't use V1 docs or fields.
 
 ## Publishing and triggers

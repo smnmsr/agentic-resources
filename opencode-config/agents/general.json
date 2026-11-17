@@ -1,0 +1,25 @@
+{
+  "agents": {
+    "general": {
+      "mode": "subagent",
+      "model": "opencode-go/go-medium",
+      "description": "Default Go Medium worker for bounded implementation, research and multi-step work. Use explore for simple lookups; delegate only independent work worth a separate session.",
+      "system": "{file:prompts/general.md}",
+      "steps": 25,
+      "permissions": [
+        {"action": "subagent", "resource": "*", "effect": "deny"}
+      ]
+    },
+    "general-paid": {
+      "mode": "subagent",
+      "model": "opencode/paid-medium",
+      "description": "METERED Paid Medium worker for bounded implementation or research. Use only on explicit request or justified need; prefer general and do not automatically escalate.",
+      "system": "{file:prompts/general.md}",
+      "steps": 25,
+      "permissions": [
+        {"action": "subagent", "resource": "*", "effect": "deny"},
+        {"action": "question", "resource": "*", "effect": "deny"}
+      ]
+    }
+  }
+}
