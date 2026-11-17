@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-14 · 128 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-17 · 129 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -8,7 +8,7 @@ AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage
 
 ## Go frontier
 
-**14/30 endpoints matched · 26 configurations · 13 frontier points**
+**14/32 endpoints matched · 26 configurations · 13 frontier points**
 
 ![Go Pareto plot](plots/go.svg)
 
@@ -44,7 +44,7 @@ Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 
 ## Paid frontier
 
-**26/86 endpoints matched · 66 configurations · 19 frontier points**
+**26/87 endpoints matched · 66 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
 
@@ -88,8 +88,8 @@ Not ranked: 37 missing score/cost; 8 unmatched identity/pricing; 1 unsupported e
 ## Privacy filter
 
 No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
-- Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`.
-- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`.
+- Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `hy4-flash-free`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`, `qwen4-max`.
+- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `hy4-flash-free`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`.
 Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
 
 ## Special pricing

@@ -104,6 +104,9 @@
         "hy4": {
           "disabled": true
         },
+        "hy4-flash-free": {
+          "disabled": true
+        },
         "hy4-preview": {
           "disabled": true
         },
@@ -165,6 +168,9 @@
           "disabled": true
         },
         "qwen3.8-max": {
+          "disabled": true
+        },
+        "qwen4-max": {
           "disabled": true
         },
         "space-bunny": {
@@ -487,6 +493,9 @@
           "disabled": true
         },
         "hy3-preview-free": {
+          "disabled": true
+        },
+        "hy4-flash-free": {
           "disabled": true
         },
         "iceman-free": {
