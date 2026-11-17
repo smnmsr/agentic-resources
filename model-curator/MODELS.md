@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-17 · 129 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-17 · 130 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -44,7 +44,7 @@ Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 
 ## Paid frontier
 
-**26/87 endpoints matched · 66 configurations · 19 frontier points**
+**26/86 endpoints matched · 66 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
 
@@ -103,6 +103,6 @@ OpenCode input/output $ per million tokens; does not alter AA $/task.
 | `gemini-3.7-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 | `gemini-3.8-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 
-Free endpoints excluded: 1 Go, 4 Paid.
+Free endpoints excluded: 1 Go, 3 Paid.
 
 Sources: [Artificial Analysis](https://artificialanalysis.ai/) · [Go catalog](https://opencode.ai/inference/go/v1/models) · [Paid catalog](https://opencode.ai/inference/v1/models), authenticated: workspace-enabled models only.
