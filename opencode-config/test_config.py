@@ -127,6 +127,25 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(agents["title"]["model"], "opencode-go/go-small")
         self.assertEqual(agents["summary"]["model"], "opencode-go/go-small")
 
+    def test_github_writes_ask_and_reads_allowed(self):
+        from fnmatch import fnmatchcase
+        rules = config.decode((Path(__file__).resolve().parent / "settings.json").read_bytes())["permissions"]
+
+        def effect(command):
+            return next((rule["effect"] for rule in reversed(rules)
+                         if fnmatchcase("shell", rule["action"]) and fnmatchcase(command, rule["resource"])), None)
+
+        for command in ("gh pr create --title x", "gh pr comment 1 --body x", "gh api repos/o/r/issues -f title=x",
+                        "gh release create v1", "git push origin main", "git -C repo push origin main"):
+            self.assertEqual(effect(command), "ask", command)
+        for command in ("gh pr view 1", "gh pr list --state open", "gh pr diff 1", "gh pr checks 1",
+                        "gh pr status --json number", "gh issue view 3", "gh issue list --state open",
+                        "gh issue status --json number", "gh run view 9 --log", "gh run list --limit 5",
+                        "gh repo view owner/repo"):
+            self.assertEqual(effect(command), "allow", command)
+        for command in ('git commit -m "fix push bug"', "git log --grep push", "git stash push -m x"):
+            self.assertIsNone(effect(command), command)  # No rule asks; the base policy allows.
+
     def test_build_inlines_prompts_and_validates_references(self):
         source = Path(__file__).resolve().parent
         settings = config.agent_settings(source, config.decode((source / "settings.json").read_bytes()))

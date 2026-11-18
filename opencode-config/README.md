@@ -77,6 +77,12 @@ For another comparison supply the diff in the task. Reviewers do not execute tes
 or builds; they distinguish caller-supplied results from their own inspection.
 Read-only tool permissions are not an operating-system sandbox.
 
+GitHub writes ask first. `settings.json` asks before any `gh` command and before `git push`,
+except the read-only `gh` views it allowlists; unlisted `gh` subcommands ask too. Agent rules
+are appended after these, so explorers and reviewers keep their stricter limits. Rules match each
+command's raw text, so wrapped or quoted forms such as `GH_TOKEN=x gh ...`, `env gh`, `/usr/bin/gh`,
+`"gh"`, or `bash -c "git push"` are not caught. Direct REST calls (for example `curl`) are not covered.
+
 ### Regeneration and rollout
 
 After changing alias IDs, regenerate **both outputs together** before publishing:
