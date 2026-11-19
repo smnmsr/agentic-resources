@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-18 · 143 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-19 · 155 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -44,7 +44,7 @@ Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 
 ## Paid frontier
 
-**26/88 endpoints matched · 66 configurations · 19 frontier points**
+**26/89 endpoints matched · 66 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
 
@@ -89,7 +89,7 @@ Not ranked: 37 missing score/cost; 8 unmatched identity/pricing; 1 unsupported e
 
 No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
 - Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `hy4-flash-free`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`, `qwen4-max`.
-- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gpt-6.2-astra`, `gpt-6.2-sol`, `hy4-flash-free`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`.
+- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gpt-6.2-astra`, `gpt-6.2-sol`, `hy4-flash-free`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `tidepool-alpha-free`.
 Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
 
 ## Special pricing
@@ -103,6 +103,6 @@ OpenCode input/output $ per million tokens; does not alter AA $/task.
 | `gemini-3.7-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 | `gemini-3.8-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 
-Free endpoints excluded: 1 Go, 3 Paid.
+Free endpoints excluded: 1 Go, 2 Paid.
 
 Sources: [Artificial Analysis](https://artificialanalysis.ai/) · [Go catalog](https://opencode.ai/inference/go/v1/models) · [Paid catalog](https://opencode.ai/inference/v1/models), authenticated: workspace-enabled models only.

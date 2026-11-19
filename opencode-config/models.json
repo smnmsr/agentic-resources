@@ -308,6 +308,9 @@
         "gemini-4-hydrogen": {
           "disabled": true
         },
+        "gemini-4-neon": {
+          "disabled": true
+        },
         "glm-4.6": {
           "disabled": true
         },
@@ -660,6 +663,9 @@
           "disabled": true
         },
         "step-5-preview-free": {
+          "disabled": true
+        },
+        "tidepool-alpha-free": {
           "disabled": true
         },
         "trinity-large-preview-free": {
