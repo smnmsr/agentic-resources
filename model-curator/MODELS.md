@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-19 · 155 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-20 · 156 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -8,7 +8,7 @@ AA benchmark-task cost is a proxy—not your OpenCode bill or Go allowance usage
 
 ## Go frontier
 
-**14/32 endpoints matched · 26 configurations · 13 frontier points**
+**14/31 endpoints matched · 26 configurations · 13 frontier points**
 
 ![Go Pareto plot](plots/go.svg)
 
@@ -40,11 +40,11 @@ Score bands: Small <25, Medium <40, Strong ≥40 (lower bounds inclusive). Log-c
 | 12 | `gemini-4-argon` | [Gemini 4 Argon (Medium)](https://artificialanalysis.ai/models/gemini-4-argon-medium) | 47.6 | 4.3146 |
 | 13 | `gemini-4-argon` | [Gemini 4 Argon (High)](https://artificialanalysis.ai/models/gemini-4-argon) | 50.4 | 4.9733 |
 
-Not ranked: 4 missing score/cost; 3 unmatched identity/pricing; 1 unsupported effort.
+Not ranked: 3 missing score/cost; 3 unmatched identity/pricing; 1 unsupported effort.
 
 ## Paid frontier
 
-**26/89 endpoints matched · 66 configurations · 19 frontier points**
+**26/91 endpoints matched · 66 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
 
@@ -83,13 +83,13 @@ Score bands: Small <25, Medium <40, Strong <55, Flagship ≥55 (lower bounds inc
 | 18 | `claude-fable-5-2` | [Claude Fable 5.2 (Xhigh, Default Fallback)](https://artificialanalysis.ai/models/claude-fable-5-2-xhigh) | 62.2 | 14.8286 |
 | 19 | `claude-fable-5-2` | [Claude Fable 5.2 (Max, Default Fallback)](https://artificialanalysis.ai/models/claude-fable-5-2) | 64.6 | 26.5386 |
 
-Not ranked: 37 missing score/cost; 8 unmatched identity/pricing; 1 unsupported effort.
+Not ranked: 32 missing score/cost; 8 unmatched identity/pricing; 1 unsupported effort.
 
 ## Privacy filter
 
 No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
 - Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `hy4-flash-free`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`, `qwen4-max`.
-- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gpt-6.2-astra`, `gpt-6.2-sol`, `hy4-flash-free`, `iceman-free`, `inkling-2-small-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `tidepool-alpha-free`.
+- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gemini-decision-1`, `gemini-nano-banana-2.1`, `gpt-6-luna-decision`, `gpt-6.2-astra`, `gpt-6.2-sol`, `gpt-image-2.5-sunburst`, `gpt-live-1`, `grok-imagine-image-2.0`, `hy4-flash-free`, `iceman-free`, `jev-1.13`, `jev-1.13-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `tidepool-alpha-free`.
 Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
 
 ## Special pricing
@@ -99,9 +99,30 @@ OpenCode input/output $ per million tokens; does not alter AA $/task.
 | Model | Available on | Catalog rates | Regular rates / condition |
 |---|---|---:|---|
 | `gemini-4-argon` | Go, Paid | $2/$10 | $4/$20 from 2026-12-01 |
+| `claude-fable-5-2` | Paid | $8/$40 | ×{'text': 2} under catalog conditions |
+| `claude-opus-4-8` | Paid | $5/$25 | ×{'text': 2} under catalog conditions |
+| `claude-opus-5` | Paid | $5/$25 | ×{'text': 2} under catalog conditions |
+| `claude-opus-5-5` | Paid | $4/$20 | ×{'text': 2} under catalog conditions |
 | `gemini-3.6-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 | `gemini-3.7-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
 | `gemini-3.8-flash` | Paid | $0.75/$3.75 | $1.5/$7.5 from 2027-01-01 |
+| `gpt-5` | Paid | $1.07/$8.5 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5-nano` | Paid | $0.05/$0.4 | ×{'text': 0.5} under catalog conditions |
+| `gpt-5.1` | Paid | $1.07/$8.5 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.2` | Paid | $1.75/$14 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.4` | Paid | $2.5/$15 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.4-mini` | Paid | $0.75/$4.5 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.4-nano` | Paid | $0.2/$1.25 | ×{'text': 0.5} under catalog conditions |
+| `gpt-5.4-pro` | Paid | $30/$180 | ×{'text': 0.5} under catalog conditions |
+| `gpt-5.5` | Paid | $5/$30 | ×{'text': 2.5} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.5-pro` | Paid | $30/$180 | ×{'text': 0.5} under catalog conditions |
+| `gpt-5.6-luna` | Paid | $0.2/$1.2 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.6-sol` | Paid | $4/$20 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-5.6-terra` | Paid | $2/$12 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-6-astra` | Paid | $10/$50 | ×{'text': 2} under catalog conditions; ×{'text': 6} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-6-luna` | Paid | $0.1/$0.5 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-6-sol` | Paid | $2/$10 | ×{'text': 2} under catalog conditions; ×{'text': 0.5} under catalog conditions |
+| `gpt-6.1-sol` | Paid | $2/$10 | ×{'text': 2} under catalog conditions; ×{'text': 6} under catalog conditions; ×{'text': 0.5} under catalog conditions |
 
 Free endpoints excluded: 1 Go, 2 Paid.
 

@@ -311,6 +311,12 @@
         "gemini-4-neon": {
           "disabled": true
         },
+        "gemini-decision-1": {
+          "disabled": true
+        },
+        "gemini-nano-banana-2.1": {
+          "disabled": true
+        },
         "glm-4.6": {
           "disabled": true
         },
@@ -407,6 +413,9 @@
         "gpt-6-luna": {
           "disabled": true
         },
+        "gpt-6-luna-decision": {
+          "disabled": true
+        },
         "gpt-6-sol": {
           "disabled": true
         },
@@ -417,6 +426,12 @@
           "disabled": true
         },
         "gpt-6.2-sol": {
+          "disabled": true
+        },
+        "gpt-image-2.5-sunburst": {
+          "disabled": true
+        },
+        "gpt-live-1": {
           "disabled": true
         },
         "grok-4.5": {
@@ -434,6 +449,9 @@
         "grok-code": {
           "disabled": true
         },
+        "grok-imagine-image-2.0": {
+          "disabled": true
+        },
         "hy3-free": {
           "disabled": true
         },
@@ -447,6 +465,12 @@
           "disabled": true
         },
         "inkling-2-small-free": {
+          "disabled": true
+        },
+        "jev-1.13": {
+          "disabled": true
+        },
+        "jev-1.13-free": {
           "disabled": true
         },
         "kimi-k2": {
