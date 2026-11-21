@@ -185,6 +185,9 @@
         "beam-free": {
           "disabled": true
         },
+        "bge-m3": {
+          "disabled": true
+        },
         "big-pickle": {
           "disabled": true
         },
@@ -243,6 +246,15 @@
           "disabled": true
         },
         "claude-sonnet-5-5": {
+          "disabled": true
+        },
+        "codestral-embed": {
+          "disabled": true
+        },
+        "cohere-embed-v5-fast": {
+          "disabled": true
+        },
+        "cohere-embed-v5-pro": {
           "disabled": true
         },
         "crouton-alpha-free": {
@@ -312,6 +324,12 @@
           "disabled": true
         },
         "gemini-decision-1": {
+          "disabled": true
+        },
+        "gemini-embedding-001": {
+          "disabled": true
+        },
+        "gemini-embedding-2": {
           "disabled": true
         },
         "gemini-nano-banana-2.1": {
@@ -563,6 +581,9 @@
         "minimax-m3.1-flash-free": {
           "disabled": true
         },
+        "mistral-embed": {
+          "disabled": true
+        },
         "mistral-large-4": {
           "disabled": true
         },
@@ -665,6 +686,9 @@
         "qwen3-coder": {
           "disabled": true
         },
+        "qwen3-embedding-8b": {
+          "disabled": true
+        },
         "qwen3.5-plus": {
           "disabled": true
         },
@@ -689,10 +713,22 @@
         "step-5-preview-free": {
           "disabled": true
         },
+        "text-embedding-3-large": {
+          "disabled": true
+        },
+        "text-embedding-3-small": {
+          "disabled": true
+        },
         "tidepool-alpha-free": {
           "disabled": true
         },
         "trinity-large-preview-free": {
+          "disabled": true
+        },
+        "voyage-4": {
+          "disabled": true
+        },
+        "voyage-code-4": {
           "disabled": true
         },
         "x-preview-f-free": {

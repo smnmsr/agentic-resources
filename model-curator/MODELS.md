@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-20 · 156 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-21 · 157 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -20,7 +20,7 @@ Score bands: Small <25, Medium <40, Strong ≥40 (lower bounds inclusive). Log-c
 |---|---:|---|---:|---:|
 | Small | 5 | Claude Haiku 5.5 (Medium) | 24.6 | 0.0918 |
 | Medium | 9 | Claude Haiku 5.5 (Xhigh) | 34.6 | 0.2484 |
-| Strong | 13 | Gemini 4 Argon (High) | 50.4 | 4.9733 |
+| Strong | 13 | Gemini 4 Argon (High) | 50.4 | 9.9466 |
 
 ### Full frontier
 
@@ -37,14 +37,14 @@ Score bands: Small <25, Medium <40, Strong ≥40 (lower bounds inclusive). Log-c
 | 9 | `claude-haiku-5-5` | [Claude Haiku 5.5 (Xhigh)](https://artificialanalysis.ai/models/claude-haiku-5-5-xhigh) | 34.6 | 0.2484 |
 | 10 | `claude-haiku-5-5` | [Claude Haiku 5.5 (Max)](https://artificialanalysis.ai/models/claude-haiku-5-5) | 36.5 | 0.4110 |
 | 11 | `kimi-k3.1-pro` | [Kimi K3.1 Pro](https://artificialanalysis.ai/models/kimi-k3-1-pro) | 46.5 | 3.6812 |
-| 12 | `gemini-4-argon` | [Gemini 4 Argon (Medium)](https://artificialanalysis.ai/models/gemini-4-argon-medium) | 47.6 | 4.3146 |
-| 13 | `gemini-4-argon` | [Gemini 4 Argon (High)](https://artificialanalysis.ai/models/gemini-4-argon) | 50.4 | 4.9733 |
+| 12 | `gemini-4-argon` | [Gemini 4 Argon (Medium)](https://artificialanalysis.ai/models/gemini-4-argon-medium) | 47.6 | 8.6292 |
+| 13 | `gemini-4-argon` | [Gemini 4 Argon (High)](https://artificialanalysis.ai/models/gemini-4-argon) | 50.4 | 9.9466 |
 
 Not ranked: 3 missing score/cost; 3 unmatched identity/pricing; 1 unsupported effort.
 
 ## Paid frontier
 
-**26/91 endpoints matched · 66 configurations · 19 frontier points**
+**26/103 endpoints matched · 66 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
 
@@ -89,7 +89,7 @@ Not ranked: 32 missing score/cost; 8 unmatched identity/pricing; 1 unsupported e
 
 No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
 - Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `hy4-flash-free`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`, `qwen4-max`.
-- Paid: `big-pickle`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gemini-decision-1`, `gemini-nano-banana-2.1`, `gpt-6-luna-decision`, `gpt-6.2-astra`, `gpt-6.2-sol`, `gpt-image-2.5-sunburst`, `gpt-live-1`, `grok-imagine-image-2.0`, `hy4-flash-free`, `iceman-free`, `jev-1.13`, `jev-1.13-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `tidepool-alpha-free`.
+- Paid: `bge-m3`, `big-pickle`, `codestral-embed`, `cohere-embed-v5-fast`, `cohere-embed-v5-pro`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gemini-decision-1`, `gemini-embedding-001`, `gemini-embedding-2`, `gemini-nano-banana-2.1`, `gpt-6-luna-decision`, `gpt-6.2-astra`, `gpt-6.2-sol`, `gpt-image-2.5-sunburst`, `gpt-live-1`, `grok-imagine-image-2.0`, `hy4-flash-free`, `iceman-free`, `jev-1.13`, `jev-1.13-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `mistral-embed`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `qwen3-embedding-8b`, `text-embedding-3-large`, `text-embedding-3-small`, `tidepool-alpha-free`, `voyage-4`, `voyage-code-4`.
 Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
 
 ## Special pricing
