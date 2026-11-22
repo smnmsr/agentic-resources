@@ -335,6 +335,9 @@
         "gemini-nano-banana-2.1": {
           "disabled": true
         },
+        "gemini-omni-1.2-flash": {
+          "disabled": true
+        },
         "glm-4.6": {
           "disabled": true
         },

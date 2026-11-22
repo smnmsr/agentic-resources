@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-21 · 157 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-22 · 157 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
@@ -44,7 +44,7 @@ Not ranked: 3 missing score/cost; 3 unmatched identity/pricing; 1 unsupported ef
 
 ## Paid frontier
 
-**26/103 endpoints matched · 66 configurations · 19 frontier points**
+**26/104 endpoints matched · 66 configurations · 19 frontier points**
 
 ![Paid Pareto plot](plots/paid.svg)
 
@@ -89,7 +89,7 @@ Not ranked: 32 missing score/cost; 8 unmatched identity/pricing; 1 unsupported e
 
 No request-data training; US/EU hosting only. Unknown endpoints excluded. Reviewed 2026-11-10.
 - Go: `deepseek-v4-pro`, `deepseek-v4.1-flash`, `hy4-flash-free`, `iceman-contributor-free`, `longcat-2.0`, `longcat-2.5-free`, `muse-spark-1.2-contributor`, `muse-spark-1.3-contributor`, `qwen4-max`.
-- Paid: `bge-m3`, `big-pickle`, `codestral-embed`, `cohere-embed-v5-fast`, `cohere-embed-v5-pro`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gemini-decision-1`, `gemini-embedding-001`, `gemini-embedding-2`, `gemini-nano-banana-2.1`, `gpt-6-luna-decision`, `gpt-6.2-astra`, `gpt-6.2-sol`, `gpt-image-2.5-sunburst`, `gpt-live-1`, `grok-imagine-image-2.0`, `hy4-flash-free`, `iceman-free`, `jev-1.13`, `jev-1.13-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `mistral-embed`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `qwen3-embedding-8b`, `text-embedding-3-large`, `text-embedding-3-small`, `tidepool-alpha-free`, `voyage-4`, `voyage-code-4`.
+- Paid: `bge-m3`, `big-pickle`, `codestral-embed`, `cohere-embed-v5-fast`, `cohere-embed-v5-pro`, `flint-40b-free`, `gemini-4-carbon`, `gemini-4-hydrogen`, `gemini-4-neon`, `gemini-decision-1`, `gemini-embedding-001`, `gemini-embedding-2`, `gemini-nano-banana-2.1`, `gemini-omni-1.2-flash`, `gpt-6-luna-decision`, `gpt-6.2-astra`, `gpt-6.2-sol`, `gpt-image-2.5-sunburst`, `gpt-live-1`, `grok-imagine-image-2.0`, `hy4-flash-free`, `iceman-free`, `jev-1.13`, `jev-1.13-free`, `longcat-2.5-free`, `mimo-v2.6-flash-free`, `mistral-embed`, `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `qwen3-embedding-8b`, `text-embedding-3-large`, `text-embedding-3-small`, `tidepool-alpha-free`, `voyage-4`, `voyage-code-4`.
 Policy sources: [Go](https://opencode.ai/docs/console/go#privacy) · [Paid](https://opencode.ai/docs/console/models#privacy).
 
 ## Special pricing
