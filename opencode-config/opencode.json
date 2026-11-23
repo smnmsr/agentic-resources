@@ -507,6 +507,9 @@
         "longcat-2.0": {
           "disabled": true
         },
+        "longcat-2.5": {
+          "disabled": true
+        },
         "longcat-2.5-free": {
           "disabled": true
         },
@@ -841,6 +844,9 @@
         "gpt-live-1": {
           "disabled": true
         },
+        "gpt-live-1.1": {
+          "disabled": true
+        },
         "grok-4.5": {
           "disabled": true
         },
@@ -878,6 +884,9 @@
           "disabled": true
         },
         "jev-1.13-free": {
+          "disabled": true
+        },
+        "jev-1.14": {
           "disabled": true
         },
         "kimi-k2": {
