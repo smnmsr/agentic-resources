@@ -31,7 +31,7 @@
 <text x="936.00" y="454" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#374151">$26.54</text>
 <line x1="82" y1="432" x2="936" y2="432" stroke="#111827"/>
 <line x1="82" y1="54" x2="82" y2="432" stroke="#111827"/>
-<polyline points="82.00,379.62 292.90,332.10 296.61,331.56 347.45,316.44 370.46,299.16 404.02,287.82 420.79,281.34 425.03,270.54 469.80,245.16 520.06,234.90 738.86,180.90 823.88,174.96 838.06,159.84" fill="none" stroke="#2563eb" stroke-width="2"/>
+<polyline points="82.00,379.62 292.90,332.10 296.61,331.56 347.45,315.90 370.46,299.16 404.02,287.28 420.79,281.34 425.03,270.00 469.80,245.16 520.06,234.90 738.86,180.36 823.88,174.42 838.06,159.30" fill="none" stroke="#2563eb" stroke-width="2"/>
 <circle cx="82.00" cy="379.62" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>1. GPT-6 Luna (Low): score 9.7, $0.0051/task</title></circle>
 <line x1="82.00" y1="379.62" x2="100.00" y2="364.62" stroke="#9ca3af" stroke-width="1"/>
 <rect x="92.00" y="355.62" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
@@ -44,26 +44,26 @@
 <line x1="296.61" y1="331.56" x2="278.61" y2="316.56" stroke="#9ca3af" stroke-width="1"/>
 <rect x="270.61" y="307.56" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
 <text x="278.61" y="320.56" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">3</text>
-<circle cx="347.45" cy="316.44" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>4. GPT-6 Luna (High): score 21.4, $0.0729/task</title></circle>
-<line x1="347.45" y1="316.44" x2="365.45" y2="335.44" stroke="#9ca3af" stroke-width="1"/>
-<rect x="357.45" y="326.44" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
-<text x="365.45" y="339.44" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">4</text>
+<circle cx="347.45" cy="315.90" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>4. GPT-6 Luna (High): score 21.5, $0.0729/task</title></circle>
+<line x1="347.45" y1="315.90" x2="365.45" y2="334.90" stroke="#9ca3af" stroke-width="1"/>
+<rect x="357.45" y="325.90" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
+<text x="365.45" y="338.90" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">4</text>
 <circle cx="370.46" cy="299.16" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>5. Claude Haiku 5.5 (Medium): score 24.6, $0.0918/task</title></circle>
 <line x1="370.46" y1="299.16" x2="388.46" y2="284.16" stroke="#9ca3af" stroke-width="1"/>
 <rect x="380.46" y="275.16" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
 <text x="388.46" y="288.16" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">5</text>
-<circle cx="404.02" cy="287.82" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>6. MiMo-V2.6-Flash: score 26.7, $0.1285/task</title></circle>
-<line x1="404.02" y1="287.82" x2="422.02" y2="306.82" stroke="#9ca3af" stroke-width="1"/>
-<rect x="414.02" y="297.82" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
-<text x="422.02" y="310.82" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">6</text>
+<circle cx="404.02" cy="287.28" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>6. MiMo-V2.6-Flash: score 26.8, $0.1285/task</title></circle>
+<line x1="404.02" y1="287.28" x2="422.02" y2="306.28" stroke="#9ca3af" stroke-width="1"/>
+<rect x="414.02" y="297.28" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
+<text x="422.02" y="310.28" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">6</text>
 <circle cx="420.79" cy="281.34" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>7. GPT-6 Luna (Max): score 27.9, $0.1520/task</title></circle>
 <line x1="420.79" y1="281.34" x2="438.79" y2="246.34" stroke="#9ca3af" stroke-width="1"/>
 <rect x="430.79" y="237.34" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
 <text x="438.79" y="250.34" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">7</text>
-<circle cx="425.03" cy="270.54" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>8. Claude Haiku 5.5 (High): score 29.9, $0.1586/task</title></circle>
-<line x1="425.03" y1="270.54" x2="407.03" y2="255.54" stroke="#9ca3af" stroke-width="1"/>
-<rect x="399.03" y="246.54" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
-<text x="407.03" y="259.54" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">8</text>
+<circle cx="425.03" cy="270.00" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>8. Claude Haiku 5.5 (High): score 30, $0.1586/task</title></circle>
+<line x1="425.03" y1="270.00" x2="407.03" y2="255.00" stroke="#9ca3af" stroke-width="1"/>
+<rect x="399.03" y="246.00" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
+<text x="407.03" y="259.00" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">8</text>
 <circle cx="469.80" cy="245.16" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>9. Claude Haiku 5.5 (Xhigh): score 34.6, $0.2484/task</title></circle>
 <line x1="469.80" y1="245.16" x2="487.80" y2="230.16" stroke="#9ca3af" stroke-width="1"/>
 <rect x="479.80" y="221.16" width="16" height="18" rx="3" fill="white" stroke="#d1d5db"/>
@@ -72,18 +72,18 @@
 <line x1="520.06" y1="234.90" x2="542.06" y2="219.90" stroke="#9ca3af" stroke-width="1"/>
 <rect x="530.06" y="210.90" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
 <text x="542.06" y="223.90" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">10</text>
-<circle cx="738.86" cy="180.90" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>11. Kimi K3.1 Pro: score 46.5, $3.6812/task</title></circle>
-<line x1="738.86" y1="180.90" x2="760.86" y2="165.90" stroke="#9ca3af" stroke-width="1"/>
-<rect x="748.86" y="156.90" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
-<text x="760.86" y="169.90" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">11</text>
-<circle cx="823.88" cy="174.96" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>12. Gemini 4 Argon (Medium): score 47.6, $8.6292/task</title></circle>
-<line x1="823.88" y1="174.96" x2="801.88" y2="159.96" stroke="#9ca3af" stroke-width="1"/>
-<rect x="789.88" y="150.96" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
-<text x="801.88" y="163.96" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">12</text>
-<circle cx="838.06" cy="159.84" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>13. Gemini 4 Argon (High): score 50.4, $9.9466/task</title></circle>
-<line x1="838.06" y1="159.84" x2="860.06" y2="144.84" stroke="#9ca3af" stroke-width="1"/>
-<rect x="848.06" y="135.84" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
-<text x="860.06" y="148.84" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">13</text>
+<circle cx="738.86" cy="180.36" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>11. Kimi K3.1 Pro: score 46.6, $3.6812/task</title></circle>
+<line x1="738.86" y1="180.36" x2="760.86" y2="165.36" stroke="#9ca3af" stroke-width="1"/>
+<rect x="748.86" y="156.36" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
+<text x="760.86" y="169.36" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">11</text>
+<circle cx="823.88" cy="174.42" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>12. Gemini 4 Argon (Medium): score 47.7, $8.6292/task</title></circle>
+<line x1="823.88" y1="174.42" x2="801.88" y2="159.42" stroke="#9ca3af" stroke-width="1"/>
+<rect x="789.88" y="150.42" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
+<text x="801.88" y="163.42" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">12</text>
+<circle cx="838.06" cy="159.30" r="4.5" fill="#2563eb" stroke="white" stroke-width="1.5"><title>13. Gemini 4 Argon (High): score 50.5, $9.9466/task</title></circle>
+<line x1="838.06" y1="159.30" x2="860.06" y2="144.30" stroke="#9ca3af" stroke-width="1"/>
+<rect x="848.06" y="135.30" width="24" height="18" rx="3" fill="white" stroke="#d1d5db"/>
+<text x="860.06" y="148.30" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#111827">13</text>
 <text x="509" y="484" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#111827">AA cost per Intelligence Index task (USD, log scale)</text>
 <text x="20" y="243" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#111827" transform="rotate(-90 20 243)">AA Intelligence Index score</text>
 </svg>

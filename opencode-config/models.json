@@ -103,6 +103,9 @@
         "grok-4.7": {
           "disabled": true
         },
+        "hungerg-free": {
+          "disabled": true
+        },
         "hy3": {
           "disabled": true
         },
@@ -497,6 +500,12 @@
         "grok-imagine-image-2.0": {
           "disabled": true
         },
+        "grok-imagine-video-1.5": {
+          "disabled": true
+        },
+        "grok-imagine-video-1.5-lite": {
+          "disabled": true
+        },
         "hy3-free": {
           "disabled": true
         },
@@ -540,6 +549,9 @@
           "disabled": true
         },
         "kimi-k3": {
+          "disabled": true
+        },
+        "kimi-k3.1-pro": {
           "disabled": true
         },
         "laguna-s-2.1-free": {
@@ -655,7 +667,7 @@
           "name": "Paid Flagship",
           "disabled": false,
           "settings": {
-            "effort": "medium",
+            "effort": "high",
             "thinking": {
               "type": "adaptive",
               "display": "summarized"
