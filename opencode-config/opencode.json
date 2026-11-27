@@ -868,6 +868,9 @@
         "gpt-live-1.1": {
           "disabled": true
         },
+        "gpt-transcribe": {
+          "disabled": true
+        },
         "grok-4.5": {
           "disabled": true
         },
@@ -890,6 +893,9 @@
           "disabled": true
         },
         "grok-imagine-video-1.5-lite": {
+          "disabled": true
+        },
+        "grok-voice-transcribe-2.0": {
           "disabled": true
         },
         "hy3-free": {
@@ -1136,6 +1142,9 @@
           "disabled": true
         },
         "ring-2.6-1t-free": {
+          "disabled": true
+        },
+        "seaglass-alpha-free": {
           "disabled": true
         },
         "space-bunny-free": {
