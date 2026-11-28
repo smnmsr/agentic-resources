@@ -1,6 +1,6 @@
 # OpenCode model frontiers
 
-**AA Intelligence Index v5.0 · 2026-11-27 · 156 scored configurations**
+**AA Intelligence Index v5.0 · 2026-11-28 · 158 scored configurations**
 
 Higher score, lower AA $/task is better. Each row is a non-dominated model/effort combination.
 Point numbers match table rows. Both plots share numeric axes; task cost is logarithmic.
